@@ -1,43 +1,25 @@
 from Tkinter import *
+from sdp6 import Robot
 
 class Application(Frame):
-  
-  UP    = 0
-  DOWN  = 1
-  LEFT  = 2
-  RIGHT = 3
-  STOP  = 4
   
   def __init__(self, master=None):
     Frame.__init__(self, master)
     self.pack()
     self.__createWidgets()
     self.bind_all('<Key>', self.__keypress)
+    self.robot = Robot()
   
   def __send_command_up(self):
-    self.__send_command(self.UP)
+    self.robot.up()
   def __send_command_down(self):
-    self.__send_command(self.DOWN)
+    self.robot.down()
   def __send_command_left(self):
-    self.__send_command(self.LEFT)
+    self.robot.left()
   def __send_command_right(self):
-    self.__send_command(self.RIGHT)
+    self.robot.right()
   def __send_command_stop(self):
-    self.__send_command(self.STOP)
-  
-  def __send_command(self, command):
-    if command == self.UP:
-      print "up"
-    elif command == self.DOWN:
-      print "down"
-    elif command == self.LEFT:
-      print "left"
-    elif command == self.RIGHT:
-      print "right"
-    elif command == self.STOP:
-      print "stop"
-    else:
-      print "bad command"
+    self.robot.stop()
 
   def __createWidgets(self):
     self.QUIT = Button(self)
@@ -72,20 +54,19 @@ class Application(Frame):
     self.button_ri.pack({"side": "right"})
     self.button_st.pack({"side": "top"})
 
-  def __keypress(self, event):
-    
+  def __keypress(self, event):    
     if event.keysym == 'Escape':
       root.destroy()
     elif event.keysym == 'Up':
-      self.__send_command(self.UP)
+      self.__send_command_up()
     elif event.keysym == 'Down':
-      self.__send_command(self.DOWN)      
+      self.__send_command_down()      
     elif event.keysym == 'Left':
-      self.__send_command(self.LEFT)
+      self.__send_command_left()
     elif event.keysym == 'Right':
-      self.__send_command(self.RIGHT)
+      self.__send_command_right()
     elif event.keysym == 's':
-      self.__send_command(self.STOP)
+      self.__send_command_stop()
 
 if __name__ == '__main__':
   root = Tk()
