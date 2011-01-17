@@ -25,6 +25,8 @@ class Application(Frame):
     self.robot.right()
   def __send_command_stop(self):
     self.robot.stop()
+  def __send_command_buzz(self):
+    self.robot.buzz()
 
   def __createWidgets(self):
     self.QUIT = Button(self)
@@ -52,7 +54,12 @@ class Application(Frame):
     self.button_st = Button(self)
     self.button_st["text"] = "Stop",
     self.button_st["command"] = self.__send_command_stop
-
+    
+    self.button_bz = Button(self)
+    self.button_bz["text"] = "Buzz",
+    self.button_bz["command"] = self.__send_command_buzz
+    
+    self.button_bz.pack({"side": "bottom"})
     self.button_up.pack({"side": "top"})
     self.button_dn.pack({"side": "bottom"})
     self.button_le.pack({"side": "left"})
@@ -72,6 +79,8 @@ class Application(Frame):
       self.__send_command_right()
     elif event.keysym == 's':
       self.__send_command_stop()
+    elif event.keysym == 'b':
+      self.__send_command_buzz()
 
 if __name__ == '__main__':
   root = Tk()

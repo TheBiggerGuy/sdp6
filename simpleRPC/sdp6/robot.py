@@ -15,12 +15,12 @@ class RobotConnectionError(Exception):
 
 class Robot(object):
   
-  LEFT_WHEEL  = Motor.PORT_A
-  RIGHT_WHEEL = Motor.PORT_B
+  LEFT_WHEEL  = 0x00
+  RIGHT_WHEEL = 0x01
   
-  BUZZER = 440
+  BUZZER = 164*10
   
-  POWER = 128
+  POWER = 80
     
   def __init__(self, host=None):
     print "Connecting ..."
@@ -45,30 +45,36 @@ class Robot(object):
   
   def up(self):
     print "go up"
-    self.brick.play_tone_and_wait(self.BUZZER, 10)
     self.leftWhell.run(power=self.POWER)
     self.rightWhell.run(power=self.POWER)
   
   def down(self):
     print "go down"
-    self.brick.play_tone_and_wait(self.BUZZER, 10)
+    self.brick.play_tone_and_wait(self.BUZZER, 1000)
     self.leftWhell.run(power=-self.POWER)
     self.rightWhell.run(power=-self.POWER)
   
-  def left(self):
-    print "go left"
-    self.brick.play_tone_and_wait(self.BUZZER, 10)
-    self.leftWhell.run(power=self.POWER)
-    self.rightWhell.brake()
-  
-  def right(self):
+  def right(self, withBrake=False):
     print "go right"
-    self.brick.play_tone_and_wait(self.BUZZER, 10)
-    self.leftWhell.brake()
+    self.leftWhell.run(power=self.POWER)
+    if withBrake:
+      self.rightWhell.brake()
+    else:
+      self.rightWhell.run(power=-self.POWER)
+  
+  def left(self, withBrake=False):
+    print "go left"
+    if withBrake:
+      self.leftWhell.brake()
+    else:
+      self.leftWhell.run(power=-self.POWER)
     self.rightWhell.run(power=self.POWER)
   
   def stop(self):
     print "go stop"
-    self.brick.play_tone_and_wait(self.BUZZER, 10)
     self.leftWhell.brake()
     self.rightWhell.brake()
+  
+  def buzz(self):
+    print "buzz"
+    self.brick.play_tone_and_wait(self.BUZZER, 1000)
