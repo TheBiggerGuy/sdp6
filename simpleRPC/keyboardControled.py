@@ -11,6 +11,8 @@ class Application(Frame):
     
     try:
       self.robot = Robot(host="00:16:53:08:A0:E6")
+      self.scale_power.set(self.robot.get_power())
+      #pass
     except Exception as error:
       print "Robot Error" # + str(error)
       raise error
@@ -27,6 +29,8 @@ class Application(Frame):
     self.robot.stop()
   def __send_command_buzz(self):
     self.robot.buzz()
+  def __send_command_power(self, value):
+    self.robot.set_power(value)
 
   def __createWidgets(self):
     self.QUIT = Button(self)
@@ -59,6 +63,13 @@ class Application(Frame):
     self.button_bz["text"] = "Buzz",
     self.button_bz["command"] = self.__send_command_buzz
     
+    self.scale_power = Scale(self)
+    self.scale_power["from_"] =-127
+    self.scale_power["to"] =127,
+    self.scale_power["orient"] = "horizontal"
+    self.scale_power["command"] = self.__send_command_power
+    
+    self.scale_power.pack({"side": "bottom"})
     self.button_bz.pack({"side": "bottom"})
     self.button_up.pack({"side": "top"})
     self.button_dn.pack({"side": "bottom"})
@@ -85,4 +96,7 @@ class Application(Frame):
 if __name__ == '__main__':
   root = Tk()
   app = Application(master=root)
-  app.mainloop()
+  try:
+    app.mainloop()
+  except KeyboardInterrupt:
+    print "bye bye"
