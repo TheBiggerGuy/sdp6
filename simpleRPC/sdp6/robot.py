@@ -15,8 +15,12 @@ class RobotConnectionError(Exception):
 
 class Robot(object):
   
-  LEFT_WHEEL  = 1
-  RIGHT_WHEEL = 2
+  LEFT_WHEEL  = Motor.PORT_A
+  RIGHT_WHEEL = Motor.PORT_B
+  
+  BUZZER = 440
+  
+  POWER = 128
     
   def __init__(self, host=None):
     print "Connecting ..."
@@ -27,13 +31,13 @@ class Robot(object):
       else:
         self.brick = BlueSock(host).connect()
       
-      print self.brick.get_device_info()
+      self.name, self.host, self.signal_strength, self.user_flash = self.brick.get_device_info()
     except nxt.locator.BrickNotFoundError:
       raise RobotNotFoundError
     except BluetoothError as error:
       raise RobotConnectionError(error)
 
-    print "Conected"
+    print "Conected to {name}".format(name=self.name)
     
     self.leftWhell = Motor(self.brick, self.LEFT_WHEEL)
     self.rightWhell = Motor(self.brick, self.RIGHT_WHEEL) 
@@ -41,30 +45,30 @@ class Robot(object):
   
   def up(self):
     print "go up"
-    #self.brick.play_tone_and_wait(10000, 10)
-    self.leftWhell.run(power=64)
-    self.rightWhell.run(power=64)
+    self.brick.play_tone_and_wait(self.BUZZER, 10)
+    self.leftWhell.run(power=self.POWER)
+    self.rightWhell.run(power=self.POWER)
   
   def down(self):
     print "go down"
-    self.brick.play_tone_and_wait(10000, 10)
-    self.leftWhell.run(power=-64)
-    self.rightWhell.run(power=-64)
+    self.brick.play_tone_and_wait(self.BUZZER, 10)
+    self.leftWhell.run(power=-self.POWER)
+    self.rightWhell.run(power=-self.POWER)
   
   def left(self):
     print "go left"
-    self.brick.play_tone_and_wait(10000, 10)
-    self.leftWhell.run(power=64)
+    self.brick.play_tone_and_wait(self.BUZZER, 10)
+    self.leftWhell.run(power=self.POWER)
     self.rightWhell.brake()
   
   def right(self):
     print "go right"
-    self.brick.play_tone_and_wait(10000, 10)
+    self.brick.play_tone_and_wait(self.BUZZER, 10)
     self.leftWhell.brake()
-    self.rightWhell.run(power=64)
+    self.rightWhell.run(power=self.POWER)
   
   def stop(self):
     print "go stop"
-    self.brick.play_tone_and_wait(10000, 10)
+    self.brick.play_tone_and_wait(self.BUZZER, 10)
     self.leftWhell.brake()
     self.rightWhell.brake()
