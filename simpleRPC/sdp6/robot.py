@@ -22,7 +22,8 @@ class Robot(object):
   POWER = 80
   BUZZER = 769
   
-  NAME = "BrickAshley"
+  #NAME = "BrickAshley"
+  NAME = "BrickAsh"
     
   def __init__(self, host=None):
     
@@ -49,7 +50,6 @@ class Robot(object):
     
     self.__get_info()
     print "Conected to {name}".format(name=self.name)
-    threading.Timer(60, self.__get_info).start()
   
   def disconnect(self):
     try:
@@ -78,6 +78,7 @@ class Robot(object):
     return self.power
   
   def __get_info(self):
+    threading.Timer(6, self.__get_info).start()
     self.name, self.host, self.signal_strength, self.user_flash = self.brick.get_device_info()
     self.battery = self.brick.get_battery_level()
     print "Info: \n\tName: {name}" \
