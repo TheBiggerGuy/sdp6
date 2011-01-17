@@ -8,7 +8,12 @@ class Application(Frame):
     self.pack()
     self.__createWidgets()
     self.bind_all('<Key>', self.__keypress)
-    self.robot = Robot(host="00:16:53:08:A0:E6")
+    
+    try:
+      self.robot = Robot(host="00:16:53:08:A0:E6")
+    except Exception as error:
+      print "Robot Error" # + str(error)
+      raise error
   
   def __send_command_up(self):
     self.robot.up()
