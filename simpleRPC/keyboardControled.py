@@ -1,7 +1,11 @@
 from Tkinter import *
 from sdp6 import Robot
+from sdp6 import RobotNotFoundError
 
 class Application(Frame):
+  
+  MAX_MOTOR_POWER = 127
+  BT_ADDRESS = "00:16:53:08:A0:E6"
   
   def __init__(self, master=None):
     Frame.__init__(self, master)
@@ -35,21 +39,25 @@ class Application(Frame):
   def __connect(self):
     self.button_connect["text"] = "Connecting"
     try:
-      self.robot = Robot(host="00:16:53:08:A0:E6")
-      self.scale_power.set(self.robot.get_power())
-      self.button_up["state"] = "enabled"
-      self.button_dn["state"] = "enabled"
-      self.button_le["state"] = "enabled"
-      self.button_ri["state"] = "enabled"
-      self.button_st["state"] = "enabled"
-      self.button_bz["state"] = "enabled"
-      self.scale_power["state"] = "enabled"
-      self.button_connect["state"] = "disabled"
-      self.button_connect["text"] = "Connected"
+      # first try to find are know robot
+      self.robot = Robot(host=self.BT_ADDRESS)
+    except RobotNotFoundError: # TODO
+      # try to find any robot
+      self.robot = Robot()
     except Exception as error:
       print "Robot Error" # + str(error)
       self.button_connect["text"] = "Connect"
       raise error
+    self.scale_power.set(self.robot.get_power())
+    self.button_up["state"] = "enabled"
+    self.button_dn["state"] = "enabled"
+    self.button_le["state"] = "enabled"
+    self.button_ri["state"] = "enabled"
+    self.button_st["state"] = "enabled"
+    self.button_bz["state"] = "enabled"
+    self.scale_power["state"] = "enabled"
+    self.button_connect["state"] = "disabled"
+    self.button_connect["text"] = "Connected"
 
   def __createWidgets(self):
     self.QUIT = Button(self)
@@ -93,8 +101,8 @@ class Application(Frame):
     self.button_connect["command"] = self.__connect
     
     self.scale_power = Scale(self)
-    self.scale_power["from_"] =-127
-    self.scale_power["to"] =127
+    self.scale_power["from_"] = -self.MAX_MOTOR_POWER
+    self.scale_power["to"] = self.MAX_MOTOR_POWER
     self.scale_power["orient"] = "horizontal"
     self.scale_power["command"] = self.__send_command_power
     self.scale_power["state"] = "disabled"
