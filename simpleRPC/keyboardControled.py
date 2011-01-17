@@ -8,29 +8,48 @@ class Application(Frame):
     self.pack()
     self.__createWidgets()
     self.bind_all('<Key>', self.__keypress)
-    
+    self.robot = None
+  
+  def __send_command_up(self):
+    if self.robot != None:
+      self.robot.up()
+  def __send_command_down(self):
+    if self.robot != None:
+      self.robot.down()
+  def __send_command_left(self):
+    if self.robot != None:
+      self.robot.left()
+  def __send_command_right(self):
+    if self.robot != None:
+      self.robot.right()
+  def __send_command_stop(self):
+    if self.robot != None:
+      self.robot.stop()
+  def __send_command_buzz(self):
+    if self.robot != None:
+      self.robot.buzz()
+  def __send_command_power(self, value):
+    if self.robot != None:
+      self.robot.set_power(value)
+  
+  def __connect(self):
+    self.button_connect["text"] = "Connecting"
     try:
       self.robot = Robot(host="00:16:53:08:A0:E6")
       self.scale_power.set(self.robot.get_power())
-      #pass
+      self.button_up["state"] = "enabled"
+      self.button_dn["state"] = "enabled"
+      self.button_le["state"] = "enabled"
+      self.button_ri["state"] = "enabled"
+      self.button_st["state"] = "enabled"
+      self.button_bz["state"] = "enabled"
+      self.scale_power["state"] = "enabled"
+      self.button_connect["state"] = "disabled"
+      self.button_connect["text"] = "Connected"
     except Exception as error:
       print "Robot Error" # + str(error)
+      self.button_connect["text"] = "Connect"
       raise error
-  
-  def __send_command_up(self):
-    self.robot.up()
-  def __send_command_down(self):
-    self.robot.down()
-  def __send_command_left(self):
-    self.robot.left()
-  def __send_command_right(self):
-    self.robot.right()
-  def __send_command_stop(self):
-    self.robot.stop()
-  def __send_command_buzz(self):
-    self.robot.buzz()
-  def __send_command_power(self, value):
-    self.robot.set_power(value)
 
   def __createWidgets(self):
     self.QUIT = Button(self)
@@ -42,33 +61,45 @@ class Application(Frame):
     self.button_up = Button(self)
     self.button_up["text"] = "Up",
     self.button_up["command"] = self.__send_command_up
+    self.button_up["state"] = "disabled"
     
     self.button_dn = Button(self)
     self.button_dn["text"] = "Down",
     self.button_dn["command"] = self.__send_command_down
+    self.button_dn["state"] = "disabled"
     
     self.button_le = Button(self)
     self.button_le["text"] = "Left",
     self.button_le["command"] = self.__send_command_left
+    self.button_le["state"] = "disabled"
     
     self.button_ri = Button(self)
     self.button_ri["text"] = "Right",
     self.button_ri["command"] = self.__send_command_right
+    self.button_ri["state"] = "disabled"
     
     self.button_st = Button(self)
-    self.button_st["text"] = "Stop",
+    self.button_st["text"] = "Stop"
     self.button_st["command"] = self.__send_command_stop
+    self.button_st["state"] = "disabled"
     
     self.button_bz = Button(self)
     self.button_bz["text"] = "Buzz",
     self.button_bz["command"] = self.__send_command_buzz
+    self.button_bz["state"] = "disabled"
+    
+    self.button_connect = Button(self)
+    self.button_connect["text"] = "Connect"
+    self.button_connect["command"] = self.__connect
     
     self.scale_power = Scale(self)
     self.scale_power["from_"] =-127
     self.scale_power["to"] =127,
     self.scale_power["orient"] = "horizontal"
     self.scale_power["command"] = self.__send_command_power
+    self.scale_power["state"] = "disabled"
     
+    self.button_connect.pack({"side": "bottom"})
     self.scale_power.pack({"side": "bottom"})
     self.button_bz.pack({"side": "bottom"})
     self.button_up.pack({"side": "top"})
@@ -79,7 +110,7 @@ class Application(Frame):
 
   def __keypress(self, event):    
     if event.keysym == 'Escape':
-      root.destroy()
+      root.destroy()    
     elif event.keysym == 'Up':
       self.__send_command_up()
     elif event.keysym == 'Down':
@@ -92,8 +123,11 @@ class Application(Frame):
       self.__send_command_stop()
     elif event.keysym == 'b':
       self.__send_command_buzz()
+    elif event.keysym == 'c':
+      self.__connect()
 
 if __name__ == '__main__':
+  print "This should work but havent tested it it yet\nTry the last commit if it does not\nguy"
   root = Tk()
   app = Application(master=root)
   try:
