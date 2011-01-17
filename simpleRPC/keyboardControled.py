@@ -59,22 +59,22 @@ class Application(Frame):
     self.QUIT.pack({"side": "bottom"})
     
     self.button_up = Button(self)
-    self.button_up["text"] = "Up",
+    self.button_up["text"] = "Up"
     self.button_up["command"] = self.__send_command_up
     self.button_up["state"] = "disabled"
     
     self.button_dn = Button(self)
-    self.button_dn["text"] = "Down",
+    self.button_dn["text"] = "Down"
     self.button_dn["command"] = self.__send_command_down
     self.button_dn["state"] = "disabled"
     
     self.button_le = Button(self)
-    self.button_le["text"] = "Left",
+    self.button_le["text"] = "Left"
     self.button_le["command"] = self.__send_command_left
     self.button_le["state"] = "disabled"
     
     self.button_ri = Button(self)
-    self.button_ri["text"] = "Right",
+    self.button_ri["text"] = "Right"
     self.button_ri["command"] = self.__send_command_right
     self.button_ri["state"] = "disabled"
     
@@ -84,7 +84,7 @@ class Application(Frame):
     self.button_st["state"] = "disabled"
     
     self.button_bz = Button(self)
-    self.button_bz["text"] = "Buzz",
+    self.button_bz["text"] = "Buzz"
     self.button_bz["command"] = self.__send_command_buzz
     self.button_bz["state"] = "disabled"
     
@@ -94,7 +94,7 @@ class Application(Frame):
     
     self.scale_power = Scale(self)
     self.scale_power["from_"] =-127
-    self.scale_power["to"] =127,
+    self.scale_power["to"] =127
     self.scale_power["orient"] = "horizontal"
     self.scale_power["command"] = self.__send_command_power
     self.scale_power["state"] = "disabled"
@@ -108,13 +108,13 @@ class Application(Frame):
     self.button_ri.pack({"side": "right"})
     self.button_st.pack({"side": "top"})
 
-  def __keypress(self, event):    
+  def __keypress(self, event):
     if event.keysym == 'Escape':
       root.destroy()    
     elif event.keysym == 'Up':
       self.__send_command_up()
     elif event.keysym == 'Down':
-      self.__send_command_down()      
+      self.__send_command_down()
     elif event.keysym == 'Left':
       self.__send_command_left()
     elif event.keysym == 'Right':
