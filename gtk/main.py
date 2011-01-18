@@ -128,17 +128,17 @@ class GTK_Main(object):
         print "Left"
     elif data.keyval == 65363: # right
         print "Right"
-    elif data.keyval == 65307: # Esc
+    elif data.keyval == 65307: # Esc65480
         self.clean_quit()
-    elif data.string == "s":
-        print "Stop!"
-    elif data.string == "f":
+    elif data.keyval == 65480: # F11
       if self.fullscreen:
         self.window.unfullscreen()
         self.fullscreen = False
       else:
         self.window.fullscreen()
         self.fullscreen = True
+    elif data.string == "s":
+        print "Stop!"
     else:
         if self.debug:
             print "DEBUG:\n\tevent: '{event}'\n\tkeyval: '{keyval}'\n\tstring: '{str_}'"\
