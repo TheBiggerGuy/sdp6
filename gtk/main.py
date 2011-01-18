@@ -5,6 +5,7 @@ import pygtk, gtk, gobject
 import pygst
 pygst.require("0.10")
 import gst
+import vte
 
 class GTK_Main(object):
   
@@ -24,25 +25,47 @@ class GTK_Main(object):
     self.window.connect("destroy", self.clean_quit)
     
     # add widgets
-    vbox_leftpanel = gtk.VBox()
-    self.window.add(vbox_leftpanel)
+    root_widget = gtk.HBox()
+    self.window.add(root_widget)
     
     vbox_rightpanel = gtk.VBox()
-    self.window.add(vbox_rightpanel)
+    root_widget.add(vbox_rightpanel)
+    
+    vbox_leftpanel = gtk.VBox()
+    vbox_leftpanel.set_size_request(150, 0)
+    root_widget.add(vbox_leftpanel)
     
     hbox_rightpanel_top = gtk.HBox()
     vbox_rightpanel.add(hbox_rightpanel_top)
     
     hbox_rightpanel_bottom = gtk.HBox()
+    hbox_rightpanel_bottom.set_size_request(0, 100)
     vbox_rightpanel.add(hbox_rightpanel_bottom)
     
     self.button = gtk.Button("Start")
     self.button.connect("clicked", self.start_stop)
-    vbox.add(self.button)
+    vbox_leftpanel.add(self.button)
+    self.button = gtk.Button("Start")
+    self.button.connect("clicked", self.start_stop)
+    vbox_leftpanel.add(self.button)
+    self.button = gtk.Button("Start")
+    self.button.connect("clicked", self.start_stop)
+    vbox_leftpanel.add(self.button)
+    self.button = gtk.Button("Start")
+    self.button.connect("clicked", self.start_stop)
+    vbox_leftpanel.add(self.button)
+    self.button = gtk.Button("Start")
+    self.button.connect("clicked", self.start_stop)
+    vbox_leftpanel.add(self.button)
     
     self.movie_window = gtk.DrawingArea()
     hbox_rightpanel_top.add(self.movie_window)
-
+    
+    self.vte = vte.Terminal()
+    self.vte.connect ("child-exited", self.respawn_vte)
+    self.vte.fork_command()
+    hbox_rightpanel_bottom.add(self.vte)
+    
     self.window.show_all()
     
     # make the gstreamer pipline
@@ -59,8 +82,17 @@ class GTK_Main(object):
     bus.enable_sync_message_emission()
     bus.connect("message", self.on_message)
     bus.connect("sync-message::element", self.on_sync_message)
+    
+    self.pipeline.set_state(gst.STATE_PLAYING)
+  
+  def respawn_vte(self, widget):
+    self.vte.fork_command()
   
   def on_key_press(self, widget, data=None):
+    print widget
+    print data
+    if widget == self.vte:
+      return
     print "click"
     if data.keyval == 65362: # up
         print "Up"
@@ -89,7 +121,7 @@ class GTK_Main(object):
   def on_key_release(self, widget, data=None):
     print "un-click"
   
-  def clean_quit(self, widget):
+  def clean_quit(self, widget=None, data=None):
     print "Clean Quit"
     gtk.main_quit()
     
