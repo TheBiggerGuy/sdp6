@@ -128,7 +128,7 @@ class GTK_Main(object):
         print "Left"
     elif data.keyval == 65363: # right
         print "Right"
-    elif data.keyval == 65307: # Esc65480
+    elif data.keyval == 65307: # Esc
         self.clean_quit()
     elif data.keyval == 65480: # F11
       if self.fullscreen:
