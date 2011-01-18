@@ -6,6 +6,10 @@ import pygst
 pygst.require("0.10")
 import gst
 import vte
+import cairo
+
+
+from time import time
 
 class GTK_Main(object):
   
@@ -18,7 +22,7 @@ class GTK_Main(object):
     # setup the window
     self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
     self.window.set_title("SDP 6")
-    self.window.set_default_size(600, 400)
+    self.window.set_default_size(850, 400)
         
     self.window.set_events(gtk.gdk.KEY_PRESS_MASK|gtk.gdk.KEY_RELEASE_MASK)
     self.window.connect("key_press_event", self.on_key_press)
@@ -67,11 +71,17 @@ class GTK_Main(object):
     self.button_fixcolour = gtk.ToggleButton("Fix Colour")
     hbox_leftpanel_feed.add(self.button_fixcolour)
     
+    button = gtk.Button("Save Frame")
+    button.connect("clicked", self.save_frame)
+    vbox_leftpanel.add(button)
+    
     for i in range(0, 5):
       button = gtk.Button("test "+str(i))
       vbox_leftpanel.add(button)
     
     self.movie_window = gtk.DrawingArea()
+    self.movie_window.set_size_request(500, 400)
+    self.movie_window.connect('expose_event', self.expose_moviewindow)
     hbox_rightpanel_top.add(self.movie_window)
     
     self.vte = vte.Terminal()
@@ -80,9 +90,29 @@ class GTK_Main(object):
     hbox_rightpanel_bottom.add(self.vte)
     
     self.window.show_all()
-    
+  
+  def expose_moviewindow(self, widget, data=None):
+    drawable = self.movie_window.window
+    pixbuf = gtk.gdk.pixbuf_new_from_file("default.svg")
+    ctx = drawable.cairo_create()
+    ctx.set_source_pixbuf(pixbuf,0,0)
+    x, y = drawable.get_size()
+    ctx.scale(x, y)
+    ctx.paint()
+    ctx.stroke()
+
   def respawn_vte(self, widget):
     self.vte.fork_command()
+  
+  def save_frame(self, widget=None, data=None):
+    drawable = self.movie_window.window
+    colormap = drawable.get_colormap()
+    pixbuf = gtk.gdk.Pixbuf(gtk.gdk.COLORSPACE_RGB, 0, 8, *drawable.get_size())
+    pixbuf = pixbuf.get_from_drawable(drawable, colormap, 0,0,0,0, *drawable.get_size())
+    name = "frame_" + str( time() ).replace(".", "")
+    pixbuf.save(name + ".png", 'png')
+    pixbuf.save(name + ".jpeg", 'jpeg')
+
   
   def on_key_press(self, widget, data=None):
     print widget
