@@ -91,9 +91,11 @@ class GTK_Main(object):
     
     self.window.show_all()
   
-  def expose_moviewindow(self, widget, data=None):
+  def expose_moviewindow(self, widget=None, data=None):
+    if self.pipeline != None:
+      return
     drawable = self.movie_window.window
-    pixbuf = gtk.gdk.pixbuf_new_from_file("default.svg")
+    pixbuf = gtk.gdk.pixbuf_new_from_file("default.png")
     ctx = drawable.cairo_create()
     ctx.set_source_pixbuf(pixbuf,0,0)
     x, y = drawable.get_size()
@@ -115,8 +117,6 @@ class GTK_Main(object):
 
   
   def on_key_press(self, widget, data=None):
-    print widget
-    print data
     if widget == self.vte:
       return
     print "click"
@@ -188,6 +188,7 @@ class GTK_Main(object):
     self.pipeline = None
     self.button.set_label("Start Feed")
     self.button.set_active(False)
+    self.expose_moviewindow()
   
   def build_pipeline(self):
     # make the gstreamer pipline
@@ -222,7 +223,10 @@ class GTK_Main(object):
   
 
 if __name__ == '__main__':
+  try:
     GTK_Main(debug=True)
     gtk.gdk.threads_init()
     gtk.main()
+  except KeyboardInterrupt:
+    print "bye bye"
 

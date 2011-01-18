@@ -7,6 +7,7 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    width="500"
@@ -14,9 +15,24 @@
    id="svg2"
    version="1.1"
    inkscape:version="0.47 r22583"
-   sodipodi:docname="New document 1">
+   sodipodi:docname="default.svg"
+   inkscape:export-filename="/afs/inf.ed.ac.uk/user/s07/s0700260/3rdYear/sdp/sdp6/gtk/default.png"
+   inkscape:export-xdpi="90"
+   inkscape:export-ydpi="90">
   <defs
      id="defs4">
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient3606">
+      <stop
+         style="stop-color:#000000;stop-opacity:1;"
+         offset="0"
+         id="stop3608" />
+      <stop
+         style="stop-color:#000000;stop-opacity:0;"
+         offset="1"
+         id="stop3610" />
+    </linearGradient>
     <pattern
        inkscape:stockid="Ermine"
        patternUnits="userSpaceOnUse"
@@ -76,6 +92,15 @@
        inkscape:vp_z="744.09448 : 526.18109 : 1"
        inkscape:persp3d-origin="372.04724 : 350.78739 : 1"
        id="perspective10" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3606"
+       id="linearGradient3614"
+       x1="-47"
+       y1="195.5"
+       x2="583"
+       y2="195.5"
+       gradientUnits="userSpaceOnUse" />
   </defs>
   <sodipodi:namedview
      id="base"
@@ -86,15 +111,15 @@
      inkscape:pageshadow="2"
      inkscape:zoom="1"
      inkscape:cx="244.23773"
-     inkscape:cy="268.57143"
+     inkscape:cy="266.57143"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
-     inkscape:window-width="819"
-     inkscape:window-height="840"
-     inkscape:window-x="392"
-     inkscape:window-y="80"
-     inkscape:window-maximized="0" />
+     inkscape:window-width="1280"
+     inkscape:window-height="949"
+     inkscape:window-x="0"
+     inkscape:window-y="25"
+     inkscape:window-maximized="1" />
   <metadata
      id="metadata7">
     <rdf:RDF>
@@ -169,5 +194,16 @@
          inkscape:box3dsidetype="3"
          d="m 238,642.95339 170,83.40879 0,316.12932 -170,-215.12932 z" />
     </g>
+    <rect
+       style="stroke-width:35;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;fill:url(#linearGradient3614);fill-opacity:1"
+       id="rect2832"
+       width="630"
+       height="457"
+       x="-47"
+       y="-33"
+       transform="translate(0,652.36218)"
+       inkscape:export-filename="/afs/inf.ed.ac.uk/user/s07/s0700260/3rdYear/sdp/sdp6/gtk/default.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
   </g>
 </svg>
