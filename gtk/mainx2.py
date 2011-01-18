@@ -74,6 +74,9 @@ class GTK_Main(object):
     self.movie_window = gtk.DrawingArea()
     hbox_rightpanel_top.add(self.movie_window)
     
+    self.movie_window2 = gtk.DrawingArea()
+    hbox_rightpanel_top.add(self.movie_window2)
+    
     self.vte = vte.Terminal()
     self.vte.connect ("child-exited", self.respawn_vte)
     self.vte.fork_command()
@@ -147,14 +150,28 @@ class GTK_Main(object):
       imagesink.set_xwindow_id(self.movie_window.window.xid)
       gtk.gdk.threads_leave()
   
+  def on_sync_message2(self, bus, message):
+    if message.structure is None:
+      return
+    message_name = message.structure.get_name()
+    if message_name == "prepare-xwindow-id":
+      imagesink = message.src
+      imagesink.set_property("force-aspect-ratio", True)
+      gtk.gdk.threads_enter()
+      imagesink.set_xwindow_id(self.movie_window2.window.xid)
+      gtk.gdk.threads_leave()
+  
   def start_feed(self):
     self.build_pipeline()
+    self.build_pipeline2()
     self.pipeline.set_state(gst.STATE_PLAYING)
+    self.pipeline2.set_state(gst.STATE_PLAYING)
     self.button.set_label("Stop")
     self.button.set_active(True)
   
   def stop_feed(self):
     self.pipeline.set_state(gst.STATE_NULL)
+    self.pipeline2.set_state(gst.STATE_NULL)
     self.pipeline = None
     self.button.set_label("Start Feed")
     self.button.set_active(False)
@@ -183,6 +200,31 @@ class GTK_Main(object):
     bus.enable_sync_message_emission()
     bus.connect("message", self.on_message)
     bus.connect("sync-message::element", self.on_sync_message)
+  
+  def build_pipeline2(self):
+    # make the gstreamer pipline
+    self.pipeline2 = gst.Pipeline("webcam 2")
+    
+    if self.feed_radio != "test":
+      source = gst.element_factory_make("videotestsrc", "webcam-source")
+    else:
+      source = gst.element_factory_make("v4l2src", "webcam-source")
+    
+    videosink = gst.element_factory_make("autovideosink", "video-output")
+    
+    if self.button_fixcolour.get_active():
+      colorspace = gst.element_factory_make("ffmpegcolorspace", "colorspace")
+      self.pipeline2.add(source, colorspace, videosink)
+      gst.element_link_many(source, colorspace, videosink)
+    else:
+      self.pipeline2.add(source, videosink)
+      gst.element_link_many(source, videosink)
+
+    bus = self.pipeline2.get_bus()
+    bus.add_signal_watch()
+    bus.enable_sync_message_emission()
+    bus.connect("message", self.on_message)
+    bus.connect("sync-message::element", self.on_sync_message2)
   
   def radio_feed_change(self, widget, data=None):
     if self.feed_radio == "real":
