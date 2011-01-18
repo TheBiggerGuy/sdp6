@@ -13,6 +13,7 @@ class GTK_Main(object):
     # save init values
     self.debug=debug
     self.fullscreen = False # this is technicaly not consistant as it is not chnaged on system uests
+    self.pipeline = None
     
     # setup the window
     self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
@@ -42,21 +43,30 @@ class GTK_Main(object):
     hbox_rightpanel_bottom.set_size_request(0, 100)
     vbox_rightpanel.add(hbox_rightpanel_bottom)
     
-    self.button = gtk.Button("Start")
+    hbox_leftpanel_feed = gtk.HBox()
+    hbox_leftpanel_feed.set_size_request(150, 0)
+    vbox_leftpanel.add(hbox_leftpanel_feed)
+    
+    self.button = gtk.ToggleButton("Start Feed")
     self.button.connect("clicked", self.start_stop)
-    vbox_leftpanel.add(self.button)
-    self.button = gtk.Button("Start")
-    self.button.connect("clicked", self.start_stop)
-    vbox_leftpanel.add(self.button)
-    self.button = gtk.Button("Start")
-    self.button.connect("clicked", self.start_stop)
-    vbox_leftpanel.add(self.button)
-    self.button = gtk.Button("Start")
-    self.button.connect("clicked", self.start_stop)
-    vbox_leftpanel.add(self.button)
-    self.button = gtk.Button("Start")
-    self.button.connect("clicked", self.start_stop)
-    vbox_leftpanel.add(self.button)
+    hbox_leftpanel_feed.add(self.button)
+    
+    vbox_leftpanel_feed_radio = gtk.VBox()
+    hbox_leftpanel_feed.add(vbox_leftpanel_feed_radio)
+    
+    radio1 = gtk.RadioButton(group=None, label="Real")
+    radio1.set_active(True)
+    radio1.connect("toggled", self.radio_feed_change)
+    vbox_leftpanel_feed_radio.add(radio1)
+    
+    self.feed_radio = "real"
+    
+    radio2 = gtk.RadioButton(group=radio1, label="Test")
+    vbox_leftpanel_feed_radio.add(radio2)
+    
+    for i in range(0, 5):
+      button = gtk.Button("test "+str(i))
+      vbox_leftpanel.add(button)
     
     self.movie_window = gtk.DrawingArea()
     hbox_rightpanel_top.add(self.movie_window)
@@ -68,23 +78,6 @@ class GTK_Main(object):
     
     self.window.show_all()
     
-    # make the gstreamer pipline
-    self.pipeline = gst.Pipeline("webcam")
-    source = gst.element_factory_make("videotestsrc", "webcam-source")
-    colorspace = gst.element_factory_make("ffmpegcolorspace", "colorspace")
-    videosink = gst.element_factory_make("autovideosink", "video-output")
-    
-    self.pipeline.add(source, colorspace, videosink)
-    gst.element_link_many(source, colorspace, videosink)
-
-    bus = self.pipeline.get_bus()
-    bus.add_signal_watch()
-    bus.enable_sync_message_emission()
-    bus.connect("message", self.on_message)
-    bus.connect("sync-message::element", self.on_sync_message)
-    
-    self.pipeline.set_state(gst.STATE_PLAYING)
-  
   def respawn_vte(self, widget):
     self.vte.fork_command()
   
@@ -125,25 +118,20 @@ class GTK_Main(object):
     print "Clean Quit"
     gtk.main_quit()
     
-  def start_stop(self, w):
-    if self.button.get_label() == "Start":
-        self.button.set_label("Stop")
-        #self.player.get_by_name("file-source").set_property("location", filepath)
-        self.pipeline.set_state(gst.STATE_PLAYING)
+  def start_stop(self, widget, data=None):
+    if self.pipeline == None:
+      self.start_feed()
     else:
-      self.pipeline.set_state(gst.STATE_NULL)
-      self.button.set_label("Start")
+      self.stop_feed()
             
   def on_message(self, bus, message):
     t = message.type
-    if t == gst.MESSAGE_EOS:
-      self.pipeline.set_state(gst.STATE_NULL)
-      self.button.set_label("Start")
+    if t == gst.MESSAGE_EOS: # end of feed
+      self.stop_feed()
     elif t == gst.MESSAGE_ERROR:
       err, debug = message.parse_error()
       print "Error: %s" % err, debug
-      self.pipeline.set_state(gst.STATE_NULL)
-      self.button.set_label("Start")
+      self.stop_feed()
   
   def on_sync_message(self, bus, message):
     if message.structure is None:
@@ -155,6 +143,46 @@ class GTK_Main(object):
       gtk.gdk.threads_enter()
       imagesink.set_xwindow_id(self.movie_window.window.xid)
       gtk.gdk.threads_leave()
+  
+  def start_feed(self):
+    self.build_pipeline()
+    self.pipeline.set_state(gst.STATE_PLAYING)
+    self.button.set_label("Stop")
+    self.button.set_active(True)
+  
+  def stop_feed(self):
+    self.pipeline.set_state(gst.STATE_NULL)
+    self.pipeline = None
+    self.button.set_label("Start Feed")
+    self.button.set_active(False)
+  
+  def build_pipeline(self):
+    # make the gstreamer pipline
+    self.pipeline = gst.Pipeline("webcam")
+    
+    if self.feed_radio == "test":
+      source = gst.element_factory_make("videotestsrc", "webcam-source")
+    else:
+      source = gst.element_factory_make("v4l2src", "webcam-source")
+    
+    #colorspace = gst.element_factory_make("ffmpegcolorspace", "colorspace")
+    videosink = gst.element_factory_make("autovideosink", "video-output")
+    
+    self.pipeline.add(source, videosink)
+    gst.element_link_many(source, videosink)
+
+    bus = self.pipeline.get_bus()
+    bus.add_signal_watch()
+    bus.enable_sync_message_emission()
+    bus.connect("message", self.on_message)
+    bus.connect("sync-message::element", self.on_sync_message)
+  
+  def radio_feed_change(self, widget, data=None):
+    if self.feed_radio == "real":
+      self.feed_radio = "test"
+    else:
+      self.feed_radio = "real"
+  
 
 if __name__ == '__main__':
     GTK_Main(debug=True)
