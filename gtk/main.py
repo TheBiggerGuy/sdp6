@@ -9,12 +9,16 @@ from gst_widget import GstDrawingArea
 from time import time
 from socket import gethostname
 
+import logging
+
 class GTK_Main(object):
   
   def __init__(self, debug=False):
     # save init values
     self.debug=debug
     self.fullscreen = False # this is technicaly not consistant as it is not chnaged on system uests
+    
+    self.log = logging.getLogger("GTK_Main")
     
     # do some jazz to see if we are on dice and or video pc
     self.hostname = gethostname()
@@ -85,7 +89,6 @@ class GTK_Main(object):
       button = gtk.Button("test "+str(i))
       vbox_leftpanel.add(button)
     
-    # TODO
     self.gst = GstDrawingArea()
     hbox_rightpanel_top.add(self.gst)
     
@@ -106,15 +109,15 @@ class GTK_Main(object):
   def on_key_press(self, widget, data=None):
     if widget == self.vte:
       return
-    print "click"
+    self.log.debug("click")
     if data.keyval == 65362: # up
-        print "Up"
+        self.log.debug("Up")
     elif data.keyval == 65364: # down
-        print "Down"
+        self.log.debug("Down")
     elif data.keyval == 65361: # left
-        print "Left"
+        self.log.debug("Left")
     elif data.keyval == 65363: # right
-        print "Right"
+        self.log.debug("Right")
     elif data.keyval == 65307: # Esc
         self.clean_quit()
     elif data.keyval == 65480: # F11
@@ -125,17 +128,17 @@ class GTK_Main(object):
         self.window.fullscreen()
         self.fullscreen = True
     elif data.string == "s":
-        print "Stop!"
+        self.log.debug("Stop!")
     else:
         if self.debug:
-            print "DEBUG:\n\tevent: '{event}'\n\tkeyval: '{keyval}'\n\tstring: '{str_}'"\
-            .format(event="key_press_unknown_key", keyval=data.keyval, str_=data.string)
+            self.log.debug("DEBUG:\n\tevent: '{event}'\n\tkeyval: '{keyval}'\n\tstring: '{str_}'"\
+            .format(event="key_press_unknown_key", keyval=data.keyval, str_=data.string))
   
   def on_key_release(self, widget, data=None):
-    print "un-click"
+    self.log.debug("un-click")
   
   def clean_quit(self, widget=None, data=None):
-    print "Clean Quit"
+    self.log.debug("Clean Quit")
     gtk.main_quit()
     
   def start_stop(self, widget, data=None):
@@ -163,10 +166,35 @@ class GTK_Main(object):
   
 
 if __name__ == '__main__':
+
+  # log all to file
+  logging.basicConfig(level=logging.DEBUG,
+                      format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
+                      datefmt='%m-%d %H:%M',
+                      filename="log/lastrun.all.log",
+                      filemode='w')
+  
+  # log warnings to file
+  handler = logging.FileHandler(filename="log/lastrun.warnings.log", mode="w")
+  handler.setLevel(logging.WARNING)
+  formatter = logging.Formatter('%(name)-12s: %(levelname)-8s %(message)s')
+  handler.setFormatter(formatter)
+  logging.getLogger('').addHandler(handler)
+  
+  # log all to concole
+  handler = logging.StreamHandler(sys.stdout)
+  handler.setLevel(logging.DEBUG)
+  formatter = logging.Formatter('%(name)-12s: %(levelname)-8s %(message)s')
+  handler.setFormatter(formatter)
+  logging.getLogger('').addHandler(handler)
+  
+  # log somthing
+  logging.debug("logging started")
+  
   try:
     GTK_Main(debug=True)
     gtk.gdk.threads_init()
     gtk.main()
   except KeyboardInterrupt:
-    print "bye bye"
+    self.log.debug("bye bye")
 

@@ -4,10 +4,14 @@ pygst.require("0.10")
 import gst
 import pygtk, gtk, gobject
 
+import logging
+
 class GstDrawingArea(gtk.DrawingArea):
   
   def __init__(self):
     self.pipeline = None
+    
+    self.log = logging.getLogger("GstDrawingArea")
     
     # make sure we are a gtk.DrawingArea
     #super().__init__()
@@ -16,8 +20,12 @@ class GstDrawingArea(gtk.DrawingArea):
     self.movie_window = gtk.DrawingArea()
     self.movie_window.set_size_request(500, 400)
     self.movie_window.connect('expose_event', self.__expose_moviewindow)
+    
+    self.log.debug("GstDrawingArea init ok")
   
   def __expose_moviewindow(self, widget=None, data=None):
+    self.log.debug("__expose_moviewindow")
+    
     if self.pipeline != None:
       return
     drawable = self.window
@@ -46,7 +54,7 @@ class GstDrawingArea(gtk.DrawingArea):
       self.stop_feed()
     elif t == gst.MESSAGE_ERROR:
       err, debug = message.parse_error()
-      print "Error: %s" % err, debug
+      self.log.error("Error: %s" % err, debug)
       self.stop_feed()
   
   def __gst_on_sync_message(self, bus, message):
