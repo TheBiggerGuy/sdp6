@@ -159,7 +159,7 @@ class GTK_Main(object):
     else:
       self.stop_feed()
             
-  def on_message(self, bus, message):
+  def gst_on_message(self, bus, message):
     t = message.type
     if t == gst.MESSAGE_EOS: # end of feed
       self.stop_feed()
@@ -168,7 +168,7 @@ class GTK_Main(object):
       print "Error: %s" % err, debug
       self.stop_feed()
   
-  def on_sync_message(self, bus, message):
+  def gst_on_sync_message(self, bus, message):
     if message.structure is None:
       return
     message_name = message.structure.get_name()
@@ -192,7 +192,14 @@ class GTK_Main(object):
     self.button.set_active(False)
     self.expose_moviewindow()
   
-  def build_pipeline(self):
+  def build_pipeline(self, rotation="clockwise", text="%feed_type%"):
+    
+    # pare the text
+    if self.feed_radio == "test":
+      text = text.replace("%feed_type%", "Test Feed")
+    else:
+      text = text.replace("%feed_type%", "Real Feed")
+    
     # make the gstreamer pipline
     self.pipeline = gst.Pipeline("webcam")
     
@@ -201,21 +208,34 @@ class GTK_Main(object):
     else:
       source = gst.element_factory_make("v4l2src", "webcam-source")
     
+    # make the pipline elements
+    videorotate = gst.element_factory_make("videoflip", "rotate video")
+    videorotate.set_property("method", rotation)
+    
+    textoverlay = gst.element_factory_make("textoverlay", "textoverlay")
+    textoverlay.set_property("text", text)
+    textoverlay.set_property("valign", "top")
+    textoverlay.set_property("halign", "right")
+    textoverlay.set_property("shaded-background", "yes")
+    textoverlay.set_property("font-desc", "Sans Bold 18")
+    
     videosink = gst.element_factory_make("autovideosink", "video-output")
     
+    # add the elemnts to the pipline
     if self.button_fixcolour.get_active():
       colorspace = gst.element_factory_make("ffmpegcolorspace", "colorspace")
-      self.pipeline.add(source, colorspace, videosink)
-      gst.element_link_many(source, colorspace, videosink)
+      self.pipeline.add(source, colorspace, videorotate, textoverlay, videosink)
+      gst.element_link_many(source, colorspace, videorotate, textoverlay, videosink)
     else:
-      self.pipeline.add(source, videosink)
-      gst.element_link_many(source, videosink)
-
+      self.pipeline.add(source, videorotate, textoverlay, videosink)
+      gst.element_link_many(source, videorotate, textoverlay, videosink)
+    
+    # get accses to the pipline message bus
     bus = self.pipeline.get_bus()
     bus.add_signal_watch()
     bus.enable_sync_message_emission()
-    bus.connect("message", self.on_message)
-    bus.connect("sync-message::element", self.on_sync_message)
+    bus.connect("message", self.gst_on_message)
+    bus.connect("sync-message::element", self.gst_on_sync_message)
   
   def radio_feed_change(self, widget, data=None):
     if self.feed_radio == "real":
