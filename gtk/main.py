@@ -95,10 +95,12 @@ class GTK_Main(object):
     if self.pipeline != None:
       return
     drawable = self.movie_window.window
-    pixbuf = gtk.gdk.pixbuf_new_from_file("default.png")
+    pixbuf = gtk.gdk.pixbuf_new_from_file("logo.png")
     ctx = drawable.cairo_create()
     ctx.set_source_pixbuf(pixbuf,0,0)
     x, y = drawable.get_size()
+    x = 500
+    y = 400
     ctx.scale(x, y)
     ctx.paint()
     ctx.stroke()
