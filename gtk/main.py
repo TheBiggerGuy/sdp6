@@ -7,6 +7,7 @@ import vte
 from gst_widget import GstDrawingArea
 
 from time import time
+from socket import gethostname
 
 class GTK_Main(object):
   
@@ -14,6 +15,17 @@ class GTK_Main(object):
     # save init values
     self.debug=debug
     self.fullscreen = False # this is technicaly not consistant as it is not chnaged on system uests
+    
+    # do some jazz to see if we are on dice and or video pc
+    self.hostname = gethostname()
+    self.are_in_inf = False
+    self.are_on_vision_pc = False
+    if self.hostname.endswith("inf.ed.ac.uk"):
+      print "we are in inf"
+      self.are_in_inf = True
+      if self.hostname.split(".")[0] in ["lappy"]:
+        print "we are on vision"
+        self.are_on_vision_pc = True
     
     # setup the window
     self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
