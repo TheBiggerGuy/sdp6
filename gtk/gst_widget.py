@@ -71,12 +71,12 @@ class GstDrawingArea(gtk.DrawingArea):
     # make the gstreamer pipline
     self.pipeline = gst.Pipeline("webcam")
     
+    # make the pipline elements
     if sourse == "test":
       source = gst.element_factory_make("videotestsrc", "webcam-source")
     else:
       source = gst.element_factory_make("v4l2src", "webcam-source")
     
-    # make the pipline elements
     videorotate = gst.element_factory_make("videoflip", "rotate video")
     videorotate.set_property("method", rotation)
     
@@ -91,9 +91,10 @@ class GstDrawingArea(gtk.DrawingArea):
     
     # add the elemnts to the pipline
     if fixcolour:
-      colorspace = gst.element_factory_make("ffmpegcolorspace", "colorspace")
-      self.pipeline.add(source, colorspace, videorotate, textoverlay, videosink)
-      gst.element_link_many(source, colorspace, videorotate, textoverlay, videosink)
+      colorspace1 = gst.element_factory_make("ffmpegcolorspace", "colorspace1")
+      colorspace2 = gst.element_factory_make("ffmpegcolorspace", "colorspace2")
+      self.pipeline.add(source, colorspace1, videorotate, colorspace2, textoverlay, videosink)
+      gst.element_link_many(source, colorspace1, videorotate, colorspace2, textoverlay, videosink)
     else:
       self.pipeline.add(source, videorotate, textoverlay, videosink)
       gst.element_link_many(source, videorotate, textoverlay, videosink)
