@@ -13,9 +13,8 @@ import logging
 
 class GTK_Main(object):
   
-  def __init__(self, debug=False):
+  def __init__(self):
     # save init values
-    self.debug=debug
     self.fullscreen = False # this is technicaly not consistant as it is not chnaged on system uests
     
     self.log = logging.getLogger("GTK_Main")
@@ -98,8 +97,11 @@ class GTK_Main(object):
     hbox_rightpanel_bottom.add(self.vte)
     
     self.window.show_all()
+    
+    self.log.debug("GTK windows complete")
 
   def respawn_vte(self, widget):
+    self.log.info("VTE respawn")
     self.vte.fork_command()
   
   def save_frame(self, widget=None, data=None):
@@ -130,9 +132,8 @@ class GTK_Main(object):
     elif data.string == "s":
         self.log.debug("Stop!")
     else:
-        if self.debug:
-            self.log.debug("DEBUG:\n\tevent: '{event}'\n\tkeyval: '{keyval}'\n\tstring: '{str_}'"\
-            .format(event="key_press_unknown_key", keyval=data.keyval, str_=data.string))
+        self.log.debug("on_key_press:\n\tevent: '{event}'\n\tkeyval: '{keyval}'\n\tstring: '{str_}'"\
+        .format(event="key_press_unknown_key", keyval=data.keyval, str_=data.string))
   
   def on_key_release(self, widget, data=None):
     self.log.debug("un-click")
@@ -169,7 +170,7 @@ if __name__ == '__main__':
 
   # log all to file
   logging.basicConfig(level=logging.DEBUG,
-                      format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
+                      format='%(asctime)s %(name)-20s %(levelname)-8s %(message)s',
                       datefmt='%m-%d %H:%M',
                       filename="log/lastrun.all.log",
                       filemode='w')
@@ -177,14 +178,14 @@ if __name__ == '__main__':
   # log warnings to file
   handler = logging.FileHandler(filename="log/lastrun.warnings.log", mode="w")
   handler.setLevel(logging.WARNING)
-  formatter = logging.Formatter('%(name)-12s: %(levelname)-8s %(message)s')
+  formatter = logging.Formatter('%(name)-20s: %(levelname)-8s %(message)s')
   handler.setFormatter(formatter)
   logging.getLogger('').addHandler(handler)
   
   # log all to concole
   handler = logging.StreamHandler(sys.stdout)
   handler.setLevel(logging.DEBUG)
-  formatter = logging.Formatter('%(name)-12s: %(levelname)-8s %(message)s')
+  formatter = logging.Formatter('%(name)-15s: %(levelname)-8s: %(message)s')
   handler.setFormatter(formatter)
   logging.getLogger('').addHandler(handler)
   
@@ -192,9 +193,9 @@ if __name__ == '__main__':
   logging.debug("logging started")
   
   try:
-    GTK_Main(debug=True)
+    GTK_Main()
     gtk.gdk.threads_init()
     gtk.main()
   except KeyboardInterrupt:
-    self.log.debug("bye bye")
+    logging.warn("ctrl-c exit")
 
