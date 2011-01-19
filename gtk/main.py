@@ -21,10 +21,8 @@ class GTK_Main(object):
     self.are_in_inf = False
     self.are_on_vision_pc = False
     if self.hostname.endswith("inf.ed.ac.uk"):
-      print "we are in inf"
       self.are_in_inf = True
-      if self.hostname.split(".")[0] in ["lappy"]:
-        print "we are on vision"
+      if self.hostname.split(".")[0] in ["lappy", "mitsubishi", "lexus", "honda"]:
         self.are_on_vision_pc = True
     
     # setup the window
