@@ -4,6 +4,7 @@ from nxt.motor import Motor
 from bluetooth import BluetoothError
 import threading
 from time import sleep
+import gc
 
 class RobotNotFoundError(Exception):
     pass
@@ -17,9 +18,9 @@ class RobotConnectionError(Exception):
 
 class Robot(object):
   
-  LEFT_WHEEL  = 0x02
-  RIGHT_WHEEL = 0x00
-  KICKER      = 0x01
+  LEFT_WHEEL  = 0x02 # port C
+  RIGHT_WHEEL = 0x00 # port A
+  KICKER      = 0x01 # port B
     
   DEFAULT_POWER = 80
   TURN_POWER    = 0.8
@@ -34,7 +35,7 @@ class Robot(object):
     self.power = self.DEFAULT_POWER
     self.address = host   
     
-    self.connect()    
+    self.connect()
     
     self.leftWhell = Motor(self.brick, self.LEFT_WHEEL)
     self.rightWhell = Motor(self.brick, self.RIGHT_WHEEL)
@@ -64,6 +65,7 @@ class Robot(object):
   def disconnect(self):
     try:
       self.brick = None
+      gc.collect()
     except:
       print "Unsafe disconect"
       
