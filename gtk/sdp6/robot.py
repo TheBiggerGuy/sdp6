@@ -72,7 +72,8 @@ class Robot(object):
       gc.collect()
     except:
       # TODO: print "Unsafe disconect"
-      
+      pass
+  
   def get_name(self):
     self.__get_info()
     return self.name
