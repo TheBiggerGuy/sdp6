@@ -3,6 +3,7 @@ from nxt.bluesock import BlueSock
 from nxt.motor import Motor
 from bluetooth import BluetoothError
 import threading
+from time import sleep
 
 class RobotNotFoundError(Exception):
     pass
@@ -16,10 +17,13 @@ class RobotConnectionError(Exception):
 
 class Robot(object):
   
-  LEFT_WHEEL  = 0x00
-  RIGHT_WHEEL = 0x01
+  LEFT_WHEEL  = 0x02
+  RIGHT_WHEEL = 0x00
+  KICKER      = 0x01
     
-  POWER = 80
+  DEFAULT_POWER = 80
+  TURN_POWER    = 0.8
+  
   BUZZER = 769
   
   #NAME = "BrickAshley"
@@ -27,14 +31,20 @@ class Robot(object):
     
   def __init__(self, host=None):
     
-    self.power = self.POWER
+    self.power = self.DEFAULT_POWER
     self.address = host   
     
     self.connect()    
     
     self.leftWhell = Motor(self.brick, self.LEFT_WHEEL)
-    self.rightWhell = Motor(self.brick, self.RIGHT_WHEEL) 
+    self.rightWhell = Motor(self.brick, self.RIGHT_WHEEL)
+    self.kicker = Motor(self.brick, self.KICKER)
     print "Set up Motors"
+    
+    try:
+      self.kicker.turn(100, 100, brake=True)
+    except Exception as error:
+      print error
   
   def connect(self):
     print "Connecting ..."
@@ -78,7 +88,7 @@ class Robot(object):
     return self.power
   
   def __get_info(self):
-    threading.Timer(6, self.__get_info).start()
+    threading.Timer(30, self.__get_info).start()
     self.name, self.host, self.signal_strength, self.user_flash = self.brick.get_device_info()
     self.battery = self.brick.get_battery_level()
     print "Info: \n\tName: {name}" \
@@ -99,27 +109,34 @@ class Robot(object):
   
   def right(self, withBrake=False):
     print "go right"
-    self.leftWhell.run(power=self.power)
+    self.leftWhell.run(power=self.power*self.TURN_POWER)
     if withBrake:
       self.rightWhell.brake()
     else:
-      self.rightWhell.run(power=-self.power)
+      self.rightWhell.run(power=-self.power*self.TURN_POWER)
   
   def left(self, withBrake=False):
     print "go left"
     if withBrake:
       self.leftWhell.brake()
     else:
-      self.leftWhell.run(power=-self.power)
-    self.rightWhell.run(power=self.power)
+      self.leftWhell.run(power=-self.power*self.TURN_POWER)
+    self.rightWhell.run(power=self.power*self.TURN_POWER)
   
   def stop(self):
     print "go stop"
     self.leftWhell.brake()
     self.rightWhell.brake()
+    self.kicker.brake()
   
   def buzz(self):
     print "buzz"
     self.brick.play_tone_and_wait(self.BUZZER, 1000)
+  
+  def kick(self):
+    print "kick"
+    self.kicker.turn(-127, 85, brake=True)
+    sleep(1.5)
+    self.kicker.turn(127, 90, brake=True)
 
 

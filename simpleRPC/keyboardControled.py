@@ -29,6 +29,9 @@ class Application(Frame):
   def __send_command_stop(self):
     if self.robot != None:
       self.robot.stop()
+  def __send_command_kick(self):
+    if self.robot != None:
+      self.robot.kick()
   def __send_command_buzz(self):
     if self.robot != None:
       self.robot.buzz()
@@ -47,15 +50,17 @@ class Application(Frame):
     except Exception as error:
       print "Robot Error" # + str(error)
       self.button_connect["text"] = "Connect"
+      self.button_connect["state"] = "active"
       raise error
+    
     self.scale_power.set(self.robot.get_power())
-    self.button_up["state"] = "enabled"
-    self.button_dn["state"] = "enabled"
-    self.button_le["state"] = "enabled"
-    self.button_ri["state"] = "enabled"
-    self.button_st["state"] = "enabled"
-    self.button_bz["state"] = "enabled"
-    self.scale_power["state"] = "enabled"
+    self.button_up["state"] = "active"
+    self.button_dn["state"] = "active"
+    self.button_le["state"] = "active"
+    self.button_ri["state"] = "active"
+    self.button_st["state"] = "active"
+    self.button_bz["state"] = "active"
+    self.scale_power["state"] = "active"
     self.button_connect["state"] = "disabled"
     self.button_connect["text"] = "Connected"
 
@@ -127,6 +132,8 @@ class Application(Frame):
       self.__send_command_left()
     elif event.keysym == 'Right':
       self.__send_command_right()
+    elif event.keysym == 'space':
+      self.__send_command_kick()
     elif event.keysym == 's':
       self.__send_command_stop()
     elif event.keysym == 'b':
