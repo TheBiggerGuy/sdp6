@@ -4,7 +4,9 @@ import sys, os
 import pygtk, gtk, gobject
 import vte
 
-from gst_widget import GstDrawingArea
+from sdp6 import GstDrawingArea
+from sdp6 import Robot
+from sdp6 import RobotNotFoundError
 
 from time import time
 from socket import gethostname
@@ -12,6 +14,9 @@ from socket import gethostname
 import logging
 
 class GTK_Main(object):
+  
+  MAX_MOTOR_POWER = 127
+  BT_ADDRESS = "00:16:53:08:A0:E6"
   
   def __init__(self):
     # save init values
