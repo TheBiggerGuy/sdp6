@@ -16,6 +16,7 @@ class GTK_Main(object):
   def __init__(self):
     # save init values
     self.fullscreen = False # this is technicaly not consistant as it is not chnaged on system uests
+    self.robot = None
     
     self.log = logging.getLogger("GTK_Main")
     
@@ -84,6 +85,10 @@ class GTK_Main(object):
     button.connect("clicked", self.save_frame)
     vbox_leftpanel.add(button)
     
+    self.button_connect = gtk.ToggleButton("Connect")
+    self.button_connect.connect("clicked", self.__connect)
+    vbox_leftpanel.add(self.button_connect)
+    
     for i in range(0, 5):
       button = gtk.Button("test "+str(i))
       vbox_leftpanel.add(button)
@@ -91,35 +96,42 @@ class GTK_Main(object):
     self.gst = GstDrawingArea()
     hbox_rightpanel_top.add(self.gst)
     
-    self.vte = vte.Terminal()
-    self.vte.connect ("child-exited", self.respawn_vte)
-    self.vte.fork_command()
-    hbox_rightpanel_bottom.add(self.vte)
+    #self.vte = vte.Terminal()
+    #self.vte.connect ("child-exited", self.respawn_vte)
+    #self.vte.fork_command()
+    #hbox_rightpanel_bottom.add(self.vte)
     
     self.window.show_all()
-    
     self.log.debug("GTK windows complete")
 
-  def respawn_vte(self, widget):
-    self.log.info("VTE respawn")
-    self.vte.fork_command()
+  #def respawn_vte(self, widget):
+  #  self.log.info("VTE respawn")
+  #  self.vte.fork_command()
   
   def save_frame(self, widget=None, data=None):
     self.gst.save_frame(widget=widget, data=data)
 
   
   def on_key_press(self, widget, data=None):
-    if widget == self.vte:
-      return
+    #if widget == self.vte:
+    #  return
     self.log.debug("click")
     if data.keyval == 65362: # up
         self.log.debug("Up")
+        if self.robot != None:
+          self.robot.up()
     elif data.keyval == 65364: # down
         self.log.debug("Down")
+        if self.robot != None:
+          self.robot.down()
     elif data.keyval == 65361: # left
         self.log.debug("Left")
+        if self.robot != None:
+          self.robot.left()
     elif data.keyval == 65363: # right
         self.log.debug("Right")
+        if self.robot != None:
+          self.robot.right()
     elif data.keyval == 65307: # Esc
         self.clean_quit()
     elif data.keyval == 65480: # F11
@@ -164,6 +176,18 @@ class GTK_Main(object):
       self.feed_radio = "test"
     else:
       self.feed_radio = "real"
+  
+  def __connect(self, widget=None, data=None):
+    self.button_connect.set_label("Connecting")
+    try:
+      # first try to find are know robot
+      self.robot = Robot(host=self.BT_ADDRESS)
+      self.button_connect.set_label("Conected")
+      self.button_connect.set_active(False)
+    except Exception as error:
+      self.log.error("Robot Error")
+      self.button_connect.set_label("Connect")
+      self.button_connect.set_active(True)
   
 
 if __name__ == '__main__':
