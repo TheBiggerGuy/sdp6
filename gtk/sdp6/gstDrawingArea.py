@@ -5,6 +5,7 @@ import gst
 import pygtk, gtk, gobject
 
 import logging
+from time import time
 
 class GstDrawingArea(gtk.DrawingArea):
   
@@ -14,12 +15,10 @@ class GstDrawingArea(gtk.DrawingArea):
     self.log = logging.getLogger("GstDrawingArea")
     
     # make sure we are a gtk.DrawingArea
-    #super().__init__()
-    super(GstDrawingArea, self).__init__()
-    
-    self.movie_window = gtk.DrawingArea()
-    self.movie_window.set_size_request(500, 400)
-    self.movie_window.connect('expose_event', self.__expose_moviewindow)
+    super(gtk.DrawingArea, self).__init__()
+
+    self.set_size_request(500, 400)
+    self.connect('expose_event', self.__expose_moviewindow)
     
     self.log.debug("GstDrawingArea init ok")
   
@@ -40,7 +39,7 @@ class GstDrawingArea(gtk.DrawingArea):
     ctx.stroke()
   
   def save_frame(self, widget=None, data=None):
-    drawable = self.movie_window.window
+    drawable = self.window
     colormap = drawable.get_colormap()
     pixbuf = gtk.gdk.Pixbuf(gtk.gdk.COLORSPACE_RGB, 0, 8, *drawable.get_size())
     pixbuf = pixbuf.get_from_drawable(drawable, colormap, 0,0,0,0, *drawable.get_size())

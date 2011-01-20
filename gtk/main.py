@@ -8,7 +8,6 @@ from sdp6 import GstDrawingArea
 from sdp6 import Robot
 from sdp6 import RobotNotFoundError
 
-from time import time
 from socket import gethostname
 
 import logging
