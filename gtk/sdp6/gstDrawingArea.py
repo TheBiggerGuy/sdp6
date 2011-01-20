@@ -18,12 +18,12 @@ class GstDrawingArea(gtk.DrawingArea):
     super(gtk.DrawingArea, self).__init__()
 
     self.set_size_request(500, 400)
-    self.connect('expose_event', self.__expose_moviewindow)
+    self.connect('expose_event', self.__expose_event)
     
     self.log.debug("GstDrawingArea init ok")
   
-  def __expose_moviewindow(self, widget=None, data=None):
-    self.log.debug("__expose_moviewindow")
+  def __expose_event(self, widget=None, data=None):
+    self.log.debug("__expose_event")
     
     if self.pipeline != None:
       return
@@ -128,7 +128,7 @@ class GstDrawingArea(gtk.DrawingArea):
     if self.pipeline != None:
       self.pipeline.set_state(gst.STATE_NULL)
       self.pipeline = None
-    self.__expose_moviewindow()
+    self.__expose_event()
   
   def is_playing(self):
     return (self.pipeline != None)
