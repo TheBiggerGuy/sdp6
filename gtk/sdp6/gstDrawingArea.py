@@ -28,13 +28,13 @@ class GstDrawingArea(gtk.DrawingArea):
     if self.pipeline != None:
       return
     drawable = self.window
+    
     pixbuf = gtk.gdk.pixbuf_new_from_file("logo.png")
+    x, y = drawable.get_size()
+    pixbuf = pixbuf.scale_simple(x, y, gtk.gdk.INTERP_NEAREST)
+    
     ctx = drawable.cairo_create()
     ctx.set_source_pixbuf(pixbuf,0,0)
-    x, y = drawable.get_size()
-    x = 500
-    y = 400
-    ctx.scale(x, y)
     ctx.paint()
     ctx.stroke()
   
@@ -46,6 +46,9 @@ class GstDrawingArea(gtk.DrawingArea):
     name = "frame_" + str( time() ).replace(".", "")
     pixbuf.save(name + ".png", 'png')
     pixbuf.save(name + ".jpeg", 'jpeg')
+    
+    self.log.info("Screen grab '" + name + ".jpg' made")
+    self.log.info("Screen grab '" + name + ".png' made")
   
   def __gst_on_message(self, bus, message):
     t = message.type
@@ -57,6 +60,8 @@ class GstDrawingArea(gtk.DrawingArea):
       self.stop_feed()
   
   def __gst_on_sync_message(self, bus, message):
+    self.log.debug("__gst_on_sync_message")
+    
     if message.structure is None:
       return
     message_name = message.structure.get_name()
