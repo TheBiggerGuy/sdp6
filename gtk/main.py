@@ -94,7 +94,7 @@ class GTK_Main(object):
     self.button_connect.connect("clicked", self.__connect)
     vbox_leftpanel.add(self.button_connect)
     
-    for i in range(0, 5):
+    for i in range(0, 4):
       button = gtk.Button("test "+str(i))
       vbox_leftpanel.add(button)
     
@@ -146,17 +146,22 @@ class GTK_Main(object):
       else:
         self.window.fullscreen()
         self.fullscreen = True
-    elif data.string == "s":
+    elif data.string == "s":  # s
         self.log.debug("Stop!")
+        if self.robot != None:
+          self.robot.stop()
     else:
         self.log.debug("on_key_press:\n\tevent: '{event}'\n\tkeyval: '{keyval}'\n\tstring: '{str_}'"\
         .format(event="key_press_unknown_key", keyval=data.keyval, str_=data.string))
   
   def on_key_release(self, widget, data=None):
     self.log.debug("un-click")
+    if self.robot != None:
+      self.robot.stop()
   
   def clean_quit(self, widget=None, data=None):
     self.log.debug("Clean Quit")
+    self.robot = None
     gtk.main_quit()
     
   def start_stop(self, widget, data=None):
@@ -183,17 +188,29 @@ class GTK_Main(object):
       self.feed_radio = "real"
   
   def __connect(self, widget=None, data=None):
+    if not self.button_connect.get_active():
+      self.button_connect.set_active(True) # keep it active
+      return # ingnor button when not acctive
+    
+    if self.robot != None:
+      self.log.warning("Tryed to connect to a already connected brick")
+      return
+    
     self.button_connect.set_label("Connecting")
     try:
       # first try to find are know robot
       self.robot = Robot(host=self.BT_ADDRESS)
       self.button_connect.set_label("Conected")
-      self.button_connect.set_active(False)
-    except Exception as error:
-      self.log.error("Robot Error")
-      self.button_connect.set_label("Connect")
       self.button_connect.set_active(True)
+    except Exception as error:
+      self.log.error(error)
+      self.button_connect.set_label("Connect")
+      self.button_connect.set_active(False)
+      self.robot = None
   
+  def __del__(self):
+    self.log.info("__del__")
+    self.robot = None
 
 if __name__ == '__main__':
 
