@@ -132,3 +132,6 @@ class GstDrawingArea(gtk.DrawingArea):
   
   def is_playing(self):
     return (self.pipeline != None)
+  
+  def __del__(self):
+    self.log.debug("__del__")
