@@ -101,7 +101,7 @@ class Application(Frame):
     self.button_connect["command"] = self.__connect
     
     self.scale_power = Scale(self)
-    self.scale_power["from_"] = -self.MAX_MOTOR_POWER
+    self.scale_power["from_"] = -1 * self.MAX_MOTOR_POWER
     self.scale_power["to"] = self.MAX_MOTOR_POWER
     self.scale_power["orient"] = "horizontal"
     self.scale_power["command"] = self.__send_command_power
@@ -135,7 +135,6 @@ class Application(Frame):
       self.__connect()
 
 if __name__ == '__main__':
-  print "This should work but havent tested it it yet\nTry the last commit if it does not\nguy"
   root = Tk()
   app = Application(master=root)
   try:
