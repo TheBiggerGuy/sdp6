@@ -18,12 +18,20 @@ class GTK_Main(object):
   MAX_MOTOR_POWER = 127
   BT_ADDRESS = "00:16:53:08:A0:E6"
   
+  STATE_IDLE     = 0
+  STATE_UP       = 1
+  STATE_DOWN     = 2
+  STATE_RIGHT    = 3
+  STATE_LEFT     = 4
+  
   def __init__(self):
     # save init values
     self.fullscreen = False # this is technicaly not consistant as it is not chnaged on system uests
     self.robot = None
     
     self.log = logging.getLogger("GTK_Main")
+    
+    self.state = self.STATE_IDLE
     
     # do some jazz to see if we are on dice and or video pc
     self.hostname = gethostname()
@@ -123,20 +131,24 @@ class GTK_Main(object):
     self.log.debug("click")
     if data.keyval == 65362: # up
         self.log.debug("Up")
-        if self.robot != None:
+        if self.robot != None and self.state != self.STATE_UP:
           self.robot.up()
+          self.state = self.STATE_UP
     elif data.keyval == 65364: # down
         self.log.debug("Down")
-        if self.robot != None:
+        if self.robot != None and self.state != self.STATE_DOWN:
           self.robot.down()
+          self.state = self.STATE_DOWN
     elif data.keyval == 65361: # left
         self.log.debug("Left")
-        if self.robot != None:
+        if self.robot != None and self.state != self.STATE_LEFT:
           self.robot.left()
+          self.state = self.STATE_LEFT
     elif data.keyval == 65363: # right
         self.log.debug("Right")
-        if self.robot != None:
+        if self.robot != None and self.state != self.STATE_RIGHT:
           self.robot.right()
+          self.state = self.STATE_RIGHT
     elif data.keyval == 65307: # Esc
         self.clean_quit()
     elif data.keyval == 65480: # F11
@@ -148,8 +160,9 @@ class GTK_Main(object):
         self.fullscreen = True
     elif data.string == "s":  # s
         self.log.debug("Stop!")
-        if self.robot != None:
+        if self.robot != None: #TODO: think about state
           self.robot.stop()
+          self.state = self.STATE_IDLE
     else:
         self.log.debug("on_key_press:\n\tevent: '{event}'\n\tkeyval: '{keyval}'\n\tstring: '{str_}'"\
         .format(event="key_press_unknown_key", keyval=data.keyval, str_=data.string))
@@ -158,6 +171,7 @@ class GTK_Main(object):
     self.log.debug("un-click")
     if self.robot != None:
       self.robot.stop()
+      self.state = self.STATE_IDLE
   
   def clean_quit(self, widget=None, data=None):
     self.log.debug("Clean Quit")
