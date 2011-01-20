@@ -177,6 +177,8 @@ class GTK_Main(object):
     if self.robot != None:
       self.robot.stop()
       self.state = self.STATE_IDLE
+      return True
+    return False # let the rest of the GUI deal with it is we don't use it
   
   def clean_quit(self, widget=None, data=None):
     self.log.debug("Clean Quit")
