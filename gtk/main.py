@@ -125,8 +125,6 @@ class GTK_Main(object):
 
   
   def on_key_press(self, widget, data=None):
-    #if widget == self.vte:
-    #  return
     self.log.debug("click")
     if data.keyval == 65362: # up
         self.log.debug("Up")
@@ -148,6 +146,12 @@ class GTK_Main(object):
         if self.robot != None and self.state != self.STATE_RIGHT:
           self.robot.right()
           self.state = self.STATE_RIGHT
+    elif data.keyval == 32: # space
+        self.log.debug("Kick")
+        if self.robot != None:
+          self.stop()
+          self.robot.kick()
+          self.state = self.STATE_IDLE
     elif data.keyval == 65307: # Esc
         self.clean_quit()
     elif data.keyval == 65480: # F11
@@ -165,6 +169,8 @@ class GTK_Main(object):
     else:
         self.log.debug("on_key_press:\n\tevent: '{event}'\n\tkeyval: '{keyval}'\n\tstring: '{str_}'"\
         .format(event="key_press_unknown_key", keyval=data.keyval, str_=data.string))
+        return False # since we dont use the key let the rest of the GUI use it. ie enter and F1
+    return True # stop the rest of the GUI reacting
   
   def on_key_release(self, widget, data=None):
     self.log.debug("un-click")
