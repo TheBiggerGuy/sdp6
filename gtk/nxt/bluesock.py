@@ -18,7 +18,11 @@ except ImportError:
     try:
         import lightblueglue as bluetooth
     except ImportError:
-        raise ImportError("Could not find 'bluetooth' or 'lightblueglue'")
+      try:
+        import dicetooth as bluetooth
+      except ImportError:
+        raise ImportError("Could not find 'bluetooth' or 'lightblueglue' or 'dicetooth'")
+
 import os
 from .brick import Brick
 
