@@ -135,3 +135,7 @@ class GstDrawingArea(gtk.DrawingArea):
   
   def __del__(self):
     self.log.debug("__del__")
+
+if __name__ == "__main__":
+  print "Canot be run as main"
+

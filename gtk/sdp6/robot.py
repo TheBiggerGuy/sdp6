@@ -8,14 +8,15 @@ import gc
 import logging
 
 class RobotNotFoundError(Exception):
-    pass
+    def __str__(self):
+      return "Robot not Found"
 
 class RobotConnectionError(Exception):
     def __init__(self, error=None):
       self.error = error
     
     def __str__(self):
-      return str(self.error)
+      return "Bluetooth: "+str(self.error)
 
 class Robot(object):
   
@@ -71,7 +72,7 @@ class Robot(object):
       #self.get_info_thread.stop()
       gc.collect()
     except:
-      # TODO: print "Unsafe disconect"
+      self.log.warning("Unsafe disconect")
       pass
   
   def get_name(self):
@@ -86,9 +87,8 @@ class Robot(object):
   
   def set_power(self, value):
     value=int(value)
-    if value < -128 or value > 128:
-      pass
-      # TODO
+    if value < -127 or value > 127:
+      raise ValueError("Power can only be +-127")
     self.power = value
   
   def get_power(self):
@@ -112,13 +112,13 @@ class Robot(object):
     self.rightWhell.run(power=self.power)
   
   def down(self):
-    # TODO: print "go down"
+    self.log.debug("go down")
     self.brick.play_tone_and_wait(self.BUZZER, 1000)
     self.leftWhell.run(power=-self.power)
     self.rightWhell.run(power=-self.power)
   
   def right(self, withBrake=False):
-    # TODO: print "go right"
+    self.log.debug("go right")
     self.leftWhell.run(power=self.power*self.TURN_POWER)
     if withBrake:
       self.rightWhell.brake()
@@ -126,7 +126,7 @@ class Robot(object):
       self.rightWhell.run(power=-self.power*self.TURN_POWER)
   
   def left(self, withBrake=False):
-    # TODO: print "go left"
+    self.log.debug("go left")
     if withBrake:
       self.leftWhell.brake()
     else:
@@ -134,23 +134,27 @@ class Robot(object):
     self.rightWhell.run(power=self.power*self.TURN_POWER)
   
   def stop(self):
-    # TODO: print "go stop"
+    self.log.debug("go stop")
     self.leftWhell.brake()
     self.rightWhell.brake()
     self.kicker.brake()
   
   def buzz(self):
-    # TODO: print "buzz"
+    self.log.debug("buzz")
     self.brick.play_tone_and_wait(self.BUZZER, 1000)
   
   def kick(self):
-    # TODO: print "kick"
+    self.log.debug("kick")
     self.kicker.turn(-127, 85, brake=True)
     sleep(1.5)
     self.kicker.turn(127, 90, brake=True)
   
   def __del__(self):
+    self.log.debug("__del__")
     if self.brick != None:
       self.disconnect()
+
+if __name__ == "__main__":
+  print "Canot be run as main"
 
 
