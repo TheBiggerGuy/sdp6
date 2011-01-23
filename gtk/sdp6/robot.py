@@ -146,7 +146,9 @@ class Robot(object):
   def kick(self):
     self.log.debug("kick")
     self.kicker.turn(-127, 85, brake=True)
-    sleep(1.5)
+    threading.Timer(1.5, self.__kick_reset)
+  
+  def __kick_reset(self):
     self.kicker.turn(127, 90, brake=True)
   
   def __del__(self):
