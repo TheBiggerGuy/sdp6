@@ -153,6 +153,18 @@ class Robot(object):
     self.log.debug("__del__")
     if self.brick != None:
       self.disconnect()
+  
+  def __read_motor_state(self, port):
+    values = self.brick.get_output_state(port)
+    state, tacho = get_tacho_and_state(values)
+    return state, tacho
+  
+  def kick_to(self, angle, kpower=127, withBrake=True):
+    state, tacho = self.__read_motor_state(self.KICKER)
+    if angle < tacho:
+      self.kicker.turn(-kpower, tacho-angle, brake=withBrake)
+    else:
+      self.kicker.turn(+kpower, angle-tacho, brake=withBrake)
 
 if __name__ == "__main__":
   print "Canot be run as main"
