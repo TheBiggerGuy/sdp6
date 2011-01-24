@@ -51,7 +51,7 @@ class Robot(object):
     try:
       #self.kicker.turn(100, 100, brake=True)
       
-      print str(self.__read_motor_state(self.KICKER))
+      self.log.debug(self.__read_motor_state(self.KICKER))
       
     except Exception as error:
       self.log.error("kicker reset error: " + str(error))
@@ -166,11 +166,21 @@ class Robot(object):
     self.log.debug("__read_motor_state: values='{0}'".format(values))
     #state, tacho = get_tacho_and_state(values)
     #self.log.debug("__read_motor_state: state='{0}', tacho='{1}'".format(state, tacho))
-    print get_tacho_and_state(values).to_list()
-    return state, tacho
+    left, kick, right = values[-3:]
+    
+    if port == self.KICKER:
+      return kick
+    elif port == self.LEFT_WHEEL:
+      return left
+    elif port == self.RIGHT_WHEEL:
+      return left
+    else:
+      raise Exception("meh")
   
   def get_state(self):
     self.__read_motor_state(self.KICKER)
+    self.__read_motor_state(self.LEFT_WHEEL)
+    self.__read_motor_state(self.RIGHT_WHEEL)
   
   def kick_to(self, angle, kpower=127, withBrake=True):
     state, tacho = self.__read_motor_state(self.KICKER)
