@@ -1,8 +1,10 @@
 import nxt
 from nxt.bluesock import BlueSock
 from nxt.motor import Motor
-from bluetooth import BluetoothError
-#import threading
+from nxt.motor import get_tacho_and_state
+#from nxt.motor import OutputState
+#from bluetooth import BluetoothError
+import threading
 from time import sleep
 import gc
 import logging
@@ -47,7 +49,10 @@ class Robot(object):
     self.log.info("Set up Motors")
     
     try:
-      self.kicker.turn(100, 100, brake=True)
+      #self.kicker.turn(100, 100, brake=True)
+      
+      print str(self.__read_motor_state(self.KICKER))
+      
     except Exception as error:
       self.log.error("kicker reset error: " + str(error))
   
@@ -60,7 +65,7 @@ class Robot(object):
         self.brick = BlueSock(self.address).connect()      
     except nxt.locator.BrickNotFoundError:
       raise RobotNotFoundError
-    except BluetoothError as error:
+    except Exception as error:
       raise RobotConnectionError(error)
     
     self.__get_info()
@@ -137,7 +142,7 @@ class Robot(object):
     self.log.debug("go stop")
     self.leftWhell.brake()
     self.rightWhell.brake()
-    self.kicker.brake()
+    #self.kicker.brake()
   
   def buzz(self):
     self.log.debug("buzz")
@@ -146,20 +151,26 @@ class Robot(object):
   def kick(self):
     self.log.debug("kick")
     self.kicker.turn(-127, 85, brake=True)
-    threading.Timer(1.5, self.__kick_reset)
+    threading.Timer(1.5, self.__kick_reset).start()
   
   def __kick_reset(self):
-    self.kicker.turn(127, 90, brake=True)
+    self.kicker.turn(127, 90, brake=False)
   
-  def __del__(self):
-    self.log.debug("__del__")
-    if self.brick != None:
-      self.disconnect()
+  #def __del__(self):
+  #  self.log.debug("__del__")
+  #  if self.brick != None:
+  #    self.disconnect()
   
   def __read_motor_state(self, port):
     values = self.brick.get_output_state(port)
-    state, tacho = get_tacho_and_state(values)
+    self.log.debug("__read_motor_state: values='{0}'".format(values))
+    #state, tacho = get_tacho_and_state(values)
+    #self.log.debug("__read_motor_state: state='{0}', tacho='{1}'".format(state, tacho))
+    print get_tacho_and_state(values).to_list()
     return state, tacho
+  
+  def get_state(self):
+    self.__read_motor_state(self.KICKER)
   
   def kick_to(self, angle, kpower=127, withBrake=True):
     state, tacho = self.__read_motor_state(self.KICKER)

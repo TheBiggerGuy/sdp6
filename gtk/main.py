@@ -149,7 +149,7 @@ class GTK_Main(object):
     elif data.keyval == 32: # space
         self.log.debug("Kick")
         if self.robot != None:
-          self.stop()
+          self.robot.stop()
           self.robot.kick()
           self.state = self.STATE_IDLE
     elif data.keyval == 65307: # Esc
@@ -166,6 +166,10 @@ class GTK_Main(object):
         if self.robot != None: #TODO: think about state
           self.robot.stop()
           self.state = self.STATE_IDLE
+    elif data.string == "t":  # s
+        self.log.debug("Stop!")
+        if self.robot != None: #TODO: think about state
+          self.robot.get_state()
     else:
         self.log.debug("on_key_press:\n\tevent: '{event}'\n\tkeyval: '{keyval}'\n\tstring: '{str_}'"\
         .format(event="key_press_unknown_key", keyval=data.keyval, str_=data.string))
@@ -174,11 +178,12 @@ class GTK_Main(object):
   
   def on_key_release(self, widget, data=None):
     self.log.debug("un-click")
-    if self.robot != None:
-      self.robot.stop()
-      self.state = self.STATE_IDLE
-      return True
-    return False # let the rest of the GUI deal with it is we don't use it
+    #if self.robot != None:
+    #  self.robot.stop()
+    #  self.state = self.STATE_IDLE
+    #  return True
+    #return False # let the rest of the GUI deal with it is we don't use it
+    return True
   
   def clean_quit(self, widget=None, data=None):
     self.log.debug("Clean Quit")

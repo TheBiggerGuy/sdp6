@@ -10,13 +10,12 @@ from time import time
 class GstDrawingArea(gtk.DrawingArea):
   
   def __init__(self):
+    gtk.DrawingArea.__init__(self)
+    
     self.pipeline = None
     
     self.log = logging.getLogger("GstDrawingArea")
     
-    # make sure we are a gtk.DrawingArea
-    super(gtk.DrawingArea, self).__init__()
-
     self.set_size_request(500, 400)
     self.connect('expose_event', self.__expose_event)
     
