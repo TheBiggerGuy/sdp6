@@ -23,6 +23,7 @@ class GTK_Main(object):
   STATE_DOWN     = 2
   STATE_RIGHT    = 3
   STATE_LEFT     = 4
+  STATE_KICK     = 5
   
   def __init__(self):
     # save init values
@@ -101,10 +102,27 @@ class GTK_Main(object):
     self.button_connect = gtk.ToggleButton("Connect")
     self.button_connect.connect("clicked", self.__connect)
     vbox_leftpanel.add(self.button_connect)
+
     
-    for i in range(0, 4):
-      button = gtk.Button("test "+str(i))
-      vbox_leftpanel.add(button)
+    self.button_up = gtk.ToggleButton("Up")
+    self.button_up.connect("clicked", self.__up)
+    vbox_leftpanel.add(self.button_up)
+
+    self.button_down = gtk.ToggleButton("Down")
+    self.button_down.connect("clicked", self.__down)
+    vbox_leftpanel.add(self.button_down)
+
+    self.button_left = gtk.ToggleButton("Left")
+    self.button_left.connect("clicked", self.__left)
+    vbox_leftpanel.add(self.button_left)
+    
+    self.button_right = gtk.ToggleButton("Right")
+    self.button_right.connect("clicked", self.__right)
+    vbox_leftpanel.add(self.button_right)
+
+  #  for i in range(0, 4):
+  #    button = gtk.Button("test "+str(i))
+  #    vbox_leftpanel.add(button)
     
     self.gst = GstDrawingArea()
     hbox_rightpanel_top.add(self.gst)
@@ -149,6 +167,11 @@ class GTK_Main(object):
         if self.robot != None and self.state != self.STATE_RIGHT:
           self.robot.right()
           self.state = self.STATE_RIGHT
+    elif data.keyval == 32: # space => kick
+        self.log.debug("Kick")
+        if self.robot != None:
+          self.robot.kick()
+          self.state = self.STATE_KICK
     elif data.keyval == 65307: # Esc
         self.clean_quit()
     elif data.keyval == 65480: # F11
@@ -204,8 +227,8 @@ class GTK_Main(object):
   def __connect(self, widget=None, data=None):
     if not self.button_connect.get_active():
       self.button_connect.set_active(True) # keep it active
-      return # ingnor button when not acctive
-    
+      return # ignore button when not active
+
     if self.robot != None:
       self.log.warning("Tryed to connect to a already connected brick")
       return
@@ -222,6 +245,26 @@ class GTK_Main(object):
       self.button_connect.set_active(False)
       self.robot = None
   
+  def __up(self, widget=None, data=None):
+    if self.robot != None:
+          self.robot.up1()
+    return 
+  
+  def __down(self, widget=None, data=None):
+    if self.robot != None:
+          self.robot.down1()
+    return
+  
+  def __right(self, widget=None, data=None):
+    if self.robot != None:
+          self.robot.right1()
+    return 
+
+  def __left(self, widget=None, data=None):
+    if self.robot != None:
+          self.robot.left1()
+    return 
+    
   def __del__(self):
     self.log.info("__del__")
     self.robot = None

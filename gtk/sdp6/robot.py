@@ -1,6 +1,6 @@
 import nxt
 from nxt.bluesock import BlueSock
-from nxt.motor import Motor
+from nxt.motor import Motor, SynchronizedMotors
 from bluetooth import BluetoothError
 #import threading
 from time import sleep
@@ -16,14 +16,14 @@ class RobotConnectionError(Exception):
     
     def __str__(self):
       return str(self.error)
-
+ 
 class Robot(object):
   
   LEFT_WHEEL  = 0x02 # port C
   RIGHT_WHEEL = 0x00 # port A
   KICKER      = 0x01 # port B
     
-  DEFAULT_POWER = 80
+  DEFAULT_POWER = 90
   TURN_POWER    = 0.8
   
   BUZZER = 769
@@ -44,11 +44,12 @@ class Robot(object):
     self.rightWhell = Motor(self.brick, self.RIGHT_WHEEL)
     self.kicker = Motor(self.brick, self.KICKER)
     self.log.info("Set up Motors")
+    self.synchronised = SynchronizedMotors(self.leftWhell, self.rightWhell, 0)
     
-    try:
-      self.kicker.turn(100, 100, brake=True)
-    except Exception as error:
-      self.log.error("kicker reset error: " + str(error))
+   # try:
+   #   self.kicker.turn(100, 100, brake=True)
+   # except Exception as error:
+   #   self.log.error("kicker reset error: " + str(error))
   
   def connect(self):
     self.log.info("Connecting ...")
@@ -108,14 +109,37 @@ class Robot(object):
   
   def up(self):
     self.log.debug("go up")
+ #   self.synchronised.run(power=self.power)
     self.leftWhell.run(power=self.power)
-    self.rightWhell.run(power=self.power)
-  
+    self.rightWhell.run(power=self.power+2.4)
+
+  def up1(self):
+    self.log.debug("go up1")
+    #self.leftWhell.run(power=self.power)
+    #self.rightWhell.run(power=self.power)
+    #sleep(1)
+    #self.stop()
+    self.synchronised.turn(self.power, 360, brake=False)
+
+  def up2(self):
+    self.log.debug("go up")
+ #   self.synchronised.run(power=self.power)
+    self.leftWhell.run(power=self.power)
+    self.rightWhell.run(power=self.power+2.4)
+    sleep(1)
+    self.stop()	
+#    self.leftWhell.turn(self.power, 360, brake=False)
+ #   self.rightWhell.turn(self.power, 360, brake=False)
+    
   def down(self):
     # TODO: print "go down"
-    self.brick.play_tone_and_wait(self.BUZZER, 1000)
     self.leftWhell.run(power=-self.power)
     self.rightWhell.run(power=-self.power)
+
+  def down1(self):
+    # TODO: print "go down"
+    self.synchronised.turn(-self.power, 360, brake=False)
+    self.stop()
   
   def right(self, withBrake=False):
     # TODO: print "go right"
@@ -124,6 +148,17 @@ class Robot(object):
       self.rightWhell.brake()
     else:
       self.rightWhell.run(power=-self.power*self.TURN_POWER)
+    sleep(1)
+    self.stop()
+
+  def right1(self, withBrake=False):
+    # TODO: print "go right"
+    self.leftWhell.turn(self.power*self.TURN_POWER, 360, brake=False)
+    #if withBrake:
+    #  self.rightWhell.brake()
+    #else:
+    self.rightWhell.turn(-self.power*self.TURN_POWER, 360, brake=False)
+ 
   
   def left(self, withBrake=False):
     # TODO: print "go left"
@@ -132,7 +167,15 @@ class Robot(object):
     else:
       self.leftWhell.run(power=-self.power*self.TURN_POWER)
     self.rightWhell.run(power=self.power*self.TURN_POWER)
-  
+
+  def left1(self, withBrake=False):
+    # TODO: print "go left"
+    self.rightWhell.turn(self.power*self.TURN_POWER, 360, brake=True)
+   # if withBrake:
+   #   self.leftWhell.brake()
+   # else:
+    self.leftWhell.turn(-self.power*self.TURN_POWER, 360, brake=True)
+
   def stop(self):
     # TODO: print "go stop"
     self.leftWhell.brake()
@@ -144,10 +187,11 @@ class Robot(object):
     self.brick.play_tone_and_wait(self.BUZZER, 1000)
   
   def kick(self):
-    # TODO: print "kick"
-    self.kicker.turn(-127, 85, brake=True)
-    sleep(1.5)
-    self.kicker.turn(127, 90, brake=True)
+    #print "kick"
+    self.kicker.turn(127, 360, brake=False )
+    #sleep(1.5)
+    #print "testing"
+    #self.kicker.turn(127, 71, brake=True)
   
   def __del__(self):
     if self.brick != None:
