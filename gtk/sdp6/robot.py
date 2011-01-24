@@ -19,8 +19,8 @@ class RobotConnectionError(Exception):
  
 class Robot(object):
   
-  LEFT_WHEEL  = 0x02 # port C
-  RIGHT_WHEEL = 0x00 # port A
+  LEFT_WHEEL  = 0x00 # port C
+  RIGHT_WHEEL = 0x02 # port A
   KICKER      = 0x01 # port B
     
   DEFAULT_POWER = 90
@@ -119,7 +119,7 @@ class Robot(object):
     #self.rightWhell.run(power=self.power)
     #sleep(1)
     #self.stop()
-    self.synchronised.turn(self.power, 360, brake=False)
+    self.synchronised.turn(self.power, 360, brake=True)
 
   def up2(self):
     self.log.debug("go up")
@@ -138,7 +138,7 @@ class Robot(object):
 
   def down1(self):
     # TODO: print "go down"
-    self.synchronised.turn(-self.power, 360, brake=False)
+    self.synchronised.turn(-self.power, 360, brake=True)
     self.stop()
   
   def right(self, withBrake=False):
@@ -153,11 +153,11 @@ class Robot(object):
 
   def right1(self, withBrake=False):
     # TODO: print "go right"
-    self.leftWhell.turn(self.power*self.TURN_POWER, 360, brake=False)
+    self.leftWhell.turn(self.power*self.TURN_POWER, 360, brake=True)
     #if withBrake:
     #  self.rightWhell.brake()
     #else:
-    self.rightWhell.turn(-self.power*self.TURN_POWER, 360, brake=False)
+    self.rightWhell.turn(-self.power*self.TURN_POWER, 360, brake=True)
  
   
   def left(self, withBrake=False):
@@ -188,7 +188,7 @@ class Robot(object):
   
   def kick(self):
     #print "kick"
-    self.kicker.turn(127, 360, brake=False )
+    self.kicker.turn(127, 340, brake=True )
     #sleep(1.5)
     #print "testing"
     #self.kicker.turn(127, 71, brake=True)
