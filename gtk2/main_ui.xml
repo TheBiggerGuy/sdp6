@@ -188,7 +188,7 @@
                                 <property name="receives_default">False</property>
                                 <property name="active">True</property>
                                 <property name="draw_indicator">True</property>
-                                <signal name="group_changed" handler="radio_feed_change"/>
+                                <signal name="toggled" handler="radio_feed_change_real"/>
                               </object>
                               <packing>
                                 <property name="position">0</property>
@@ -203,7 +203,7 @@
                                 <property name="active">True</property>
                                 <property name="draw_indicator">True</property>
                                 <property name="group">radiobutton_feed_live</property>
-                                <signal name="group_changed" handler="radio_feed_change"/>
+                                <signal name="toggled" handler="radio_feed_change_test"/>
                               </object>
                               <packing>
                                 <property name="position">1</property>
@@ -218,6 +218,7 @@
                                 <property name="active">True</property>
                                 <property name="draw_indicator">True</property>
                                 <property name="group">radiobutton_feed_live</property>
+                                <signal name="toggled" handler="radio_feed_change_file"/>
                               </object>
                               <packing>
                                 <property name="position">2</property>
@@ -331,6 +332,7 @@
                         <property name="visible">True</property>
                         <property name="n_rows">4</property>
                         <property name="n_columns">3</property>
+                        <property name="homogeneous">True</property>
                         <child>
                           <object class="GtkButton" id="button2">
                             <property name="label" translatable="yes">Up</property>
@@ -342,6 +344,7 @@
                           <packing>
                             <property name="left_attach">1</property>
                             <property name="right_attach">2</property>
+                            <property name="y_options"></property>
                           </packing>
                         </child>
                         <child>
@@ -354,6 +357,7 @@
                           <packing>
                             <property name="top_attach">1</property>
                             <property name="bottom_attach">2</property>
+                            <property name="y_options"></property>
                           </packing>
                         </child>
                         <child>
@@ -368,6 +372,7 @@
                             <property name="right_attach">2</property>
                             <property name="top_attach">1</property>
                             <property name="bottom_attach">2</property>
+                            <property name="y_options"></property>
                           </packing>
                         </child>
                         <child>
@@ -382,6 +387,7 @@
                             <property name="right_attach">3</property>
                             <property name="top_attach">1</property>
                             <property name="bottom_attach">2</property>
+                            <property name="y_options"></property>
                           </packing>
                         </child>
                         <child>
@@ -397,6 +403,7 @@
                             <property name="right_attach">2</property>
                             <property name="top_attach">2</property>
                             <property name="bottom_attach">3</property>
+                            <property name="y_options"></property>
                           </packing>
                         </child>
                         <child>
@@ -411,19 +418,8 @@
                             <property name="right_attach">3</property>
                             <property name="top_attach">3</property>
                             <property name="bottom_attach">4</property>
+                            <property name="y_options"></property>
                           </packing>
-                        </child>
-                        <child>
-                          <placeholder/>
-                        </child>
-                        <child>
-                          <placeholder/>
-                        </child>
-                        <child>
-                          <placeholder/>
-                        </child>
-                        <child>
-                          <placeholder/>
                         </child>
                         <child>
                           <object class="GtkButton" id="button7">
@@ -435,6 +431,7 @@
                           <packing>
                             <property name="top_attach">3</property>
                             <property name="bottom_attach">4</property>
+                            <property name="y_options"></property>
                           </packing>
                         </child>
                         <child>
@@ -449,14 +446,27 @@
                             <property name="right_attach">2</property>
                             <property name="top_attach">3</property>
                             <property name="bottom_attach">4</property>
+                            <property name="y_options"></property>
                           </packing>
+                        </child>
+                        <child>
+                          <placeholder/>
+                        </child>
+                        <child>
+                          <placeholder/>
+                        </child>
+                        <child>
+                          <placeholder/>
+                        </child>
+                        <child>
+                          <placeholder/>
                         </child>
                       </object>
                     </child>
                     <child type="label">
                       <object class="GtkLabel" id="label2">
                         <property name="visible">True</property>
-                        <property name="label" translatable="yes">expander</property>
+                        <property name="label" translatable="yes">Manual Controll</property>
                       </object>
                     </child>
                   </object>
@@ -473,11 +483,22 @@
                     <signal name="clicked" handler="save_frame"/>
                   </object>
                   <packing>
+                    <property name="fill">False</property>
                     <property name="position">1</property>
                   </packing>
                 </child>
                 <child>
-                  <placeholder/>
+                  <object class="GtkToggleButton" id="togglebutton_connect">
+                    <property name="label" translatable="yes">Connect</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="receives_default">True</property>
+                    <signal name="toggled" handler="connect_to_brick"/>
+                  </object>
+                  <packing>
+                    <property name="fill">False</property>
+                    <property name="position">2</property>
+                  </packing>
                 </child>
               </object>
               <packing>
