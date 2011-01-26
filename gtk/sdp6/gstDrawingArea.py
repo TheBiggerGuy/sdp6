@@ -20,6 +20,8 @@ class GstDrawingArea(gtk.DrawingArea):
     self.connect('expose_event', self.__expose_event)
     
     self.log.debug("GstDrawingArea init ok")
+    
+    self.imageToShow = None
   
   def __expose_event(self, widget=None, data=None):
     self.log.debug("__expose_event")
@@ -28,7 +30,11 @@ class GstDrawingArea(gtk.DrawingArea):
       return
     drawable = self.window
     
-    pixbuf = gtk.gdk.pixbuf_new_from_file("logo.png")
+    if self.imageToShow == None:
+      pixbuf = gtk.gdk.pixbuf_new_from_file("logo.png")
+    else:
+      pixbuf = gtk.gdk.pixbuf_new_from_file(self.imageToShow)
+    
     x, y = drawable.get_size()
     pixbuf = pixbuf.scale_simple(x, y, gtk.gdk.INTERP_NEAREST)
     
@@ -36,6 +42,13 @@ class GstDrawingArea(gtk.DrawingArea):
     ctx.set_source_pixbuf(pixbuf,0,0)
     ctx.paint()
     ctx.stroke()
+  
+  def show_img(self, fileLoc):
+    self.log.debug("show_img")
+    if self.is_playing():
+      self.stop_video()
+    
+    self.imageToShow = fileLoc
   
   def save_frame(self, widget=None, data=None):
     drawable = self.window
@@ -46,8 +59,12 @@ class GstDrawingArea(gtk.DrawingArea):
     pixbuf.save(name + ".png", 'png')
     pixbuf.save(name + ".jpeg", 'jpeg')
     
+    return name
+    
     self.log.info("Screen grab '" + name + ".jpg' made")
     self.log.info("Screen grab '" + name + ".png' made")
+    
+    return name
   
   def __gst_on_message(self, bus, message):
     t = message.type

@@ -26,7 +26,7 @@ class Robot(object):
   RIGHT_WHEEL = 0x00 # port A
   KICKER      = 0x01 # port B
     
-  DEFAULT_POWER = 80
+  DEFAULT_POWER = 120
   TURN_POWER    = 0.8
   
   BUZZER = 769

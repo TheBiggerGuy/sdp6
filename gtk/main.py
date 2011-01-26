@@ -7,6 +7,7 @@ import vte
 from sdp6 import GstDrawingArea
 from sdp6 import Robot
 from sdp6 import RobotNotFoundError
+from sdp6 import ImageProcess
 
 from socket import gethostname
 
@@ -121,8 +122,20 @@ class GTK_Main(object):
   #  self.vte.fork_command()
   
   def save_frame(self, widget=None, data=None):
-    self.gst.save_frame(widget=widget, data=data)
-
+    self.log.debug("save_frame")
+    name = self.gst.save_frame(widget=widget, data=data)
+    
+    self.log.debug(name)
+    
+    img = ImageProcess(name+".jpg")
+    
+    self.log.debug(img)
+    
+    fileLoc = img.do_jazz()
+    
+    self.log.debug(fileLoc)
+    
+    self.gst.show_img(fileLoc)
   
   def on_key_press(self, widget, data=None):
     self.log.debug("click")

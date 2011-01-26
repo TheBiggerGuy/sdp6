@@ -7,6 +7,7 @@ import vte
 from sdp6 import GstDrawingArea
 from sdp6 import Robot
 from sdp6 import RobotNotFoundError
+from sdp6 import ImageProcess
 
 from socket import gethostname
 
@@ -138,7 +139,11 @@ class GTK_Main(object):
   def save_frame(self, widget=None, data=None):
     self.log.debug("_save_frame")
     if self.gst.is_playing():
-      self.gst.save_frame(widget=widget, data=data)
+      name = self.gst.save_frame(widget=widget, data=data)
+      img = ImageProcess(name+".png")
+      fileLoc = img.do_jazz()
+      self.gst.show_img(fileLoc)
+      
     else:
       self.log.warning("No video to save frame")
     
