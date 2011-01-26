@@ -220,15 +220,17 @@ class GTK_Main(object):
     
   def start_feed(self):
     self.gst.start_video(self.feed_radio, fixcolour=self.fix_colour)
-    self.button.set_label("Stop")
-    self.button.set_active(True)
+    # TODO
+    #self.button.set_label("Stop")
+    #self.button.set_active(True)
   
   def stop_feed(self):
     self.gst.stop_video()
-    self.button.set_label("Start Feed")
-    self.button.set_active(False)
+    # TODO
+    #self.button.set_label("Start Feed")
+    #self.button.set_active(False)
   
-  def fix_colour(self, widget=None, data=None):
+  def fix_video_colour(self, widget=None, data=None):
     self.log.debug("fix_colour")
     self.fix_colour = not self.fix_colour
   

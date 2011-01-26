@@ -249,7 +249,7 @@
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">True</property>
-                                <signal name="toggled" handler="fix_colour"/>
+                                <signal name="toggled" handler="fix_video_colour"/>
                               </object>
                               <packing>
                                 <property name="position">1</property>
