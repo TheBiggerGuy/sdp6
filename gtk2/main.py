@@ -33,6 +33,7 @@ class GTK_Main(object):
     self.robot = None
     self.feed_radio = "real"
     self.fix_colour = False
+    self.half_time = False
     self.state = self.STATE_IDLE
     
     # do some jazz to see if we are on dice and or video pc
@@ -219,7 +220,7 @@ class GTK_Main(object):
     gtk.main_quit()
     
   def start_feed(self):
-    self.gst.start_video(self.feed_radio, fixcolour=self.fix_colour)
+    self.gst.start_video(self.feed_radio, fixcolour=self.fix_colour, rotation=self.half_time)
     # TODO
     #self.button.set_label("Stop")
     #self.button.set_active(True)
@@ -231,8 +232,12 @@ class GTK_Main(object):
     #self.button.set_active(False)
   
   def fix_video_colour(self, widget=None, data=None):
-    self.log.debug("fix_colour")
+    self.log.debug("fix_video_colour")
     self.fix_colour = not self.fix_colour
+  
+  def flip_video_feed(self, widget=None, data=None):
+    self.log.debug("half_time")
+    self.half_time = not self.half_time
   
   def radio_feed_change(self, widget=None, data=None):
     self.log.debug("radio_feed_change")

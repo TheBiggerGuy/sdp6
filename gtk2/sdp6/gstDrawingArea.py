@@ -134,10 +134,13 @@ class GstDrawingArea(gtk.DrawingArea):
     bus.connect("message", self.__gst_on_message)
     bus.connect("sync-message::element", self.__gst_on_sync_message)
   
-  def start_video(self, sourse="test", fixcolour=False):
+  def start_video(self, sourse="test", fixcolour=False, rotation=False):
     if self.pipeline == None:
       self.stop_video()
-    self.__build_pipeline(sourse=sourse, fixcolour=fixcolour)
+    if rotation:
+      self.__build_pipeline(sourse=sourse, fixcolour=fixcolour, rotation="counterclockwise")
+    else:
+      self.__build_pipeline(sourse=sourse, fixcolour=fixcolour)
     self.pipeline.set_state(gst.STATE_PLAYING)
   
   def stop_video(self):
