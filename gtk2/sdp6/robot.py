@@ -29,7 +29,18 @@ class Robot(object):
   DEFAULT_POWER = 80
   TURN_POWER    = 0.8
   
-  BUZZER = 769
+  BUZZER_HZ = 769
+  
+  KICK_DISTANCE = 90
+  
+  STATE_DISCONNECTED = -1
+  STATE_IDLE         = 0
+  STATE_UP           = 1
+  STATE_DOWN         = 2
+  STATE_RIGHT        = 3
+  STATE_LEFT         = 4
+  
+  MAX_MOTOR_POWER = 127
   
   #NAME = "BrickAshley"
   NAME = "BrickAsh"
@@ -38,23 +49,9 @@ class Robot(object):
     
     self.power = -1*self.DEFAULT_POWER
     self.address = host   
+    self.state = self.STATE_DISCONNECTED
     
     self.log = logging.getLogger("Robot")
-    
-    self.connect()
-    
-    self.leftWhell = Motor(self.brick, self.LEFT_WHEEL)
-    self.rightWhell = Motor(self.brick, self.RIGHT_WHEEL)
-    self.kicker = Motor(self.brick, self.KICKER)
-    self.log.info("Set up Motors")
-    
-    try:
-      #self.kicker.turn(100, 100, brake=True)
-      
-      self.log.debug(self.__read_motor_state(self.KICKER))
-      
-    except Exception as error:
-      self.log.error("kicker reset error: " + str(error))
   
   def connect(self):
     self.log.info("Connecting ...")
@@ -67,9 +64,26 @@ class Robot(object):
       raise RobotNotFoundError
     except Exception as error:
       raise RobotConnectionError(error)
+        
+    self.leftWhell = Motor(self.brick, self.LEFT_WHEEL)
+    self.rightWhell = Motor(self.brick, self.RIGHT_WHEEL)
+    self.kicker = Motor(self.brick, self.KICKER)
+    self.log.info("Set up Motors")
+    
+    try:
+      #self.kicker.turn(100, 100, brake=True)
+      
+      self.log.debug(self.__read_motor_state(self.KICKER))
+      
+    except Exception as error:
+      self.log.error("kicker reset error: " + str(error))
+    
+    self.state = self.STATE_IDLE
     
     self.__get_info()
     self.log.info("Conected to {name}".format(name=self.name))
+    
+    self.buzz()
   
   def disconnect(self):
     try:
@@ -78,7 +92,8 @@ class Robot(object):
       gc.collect()
     except:
       self.log.warning("Unsafe disconect")
-      pass
+    
+    self.state = self.STATE_DISCONNECTED
   
   def get_name(self):
     self.__get_info()
@@ -91,10 +106,11 @@ class Robot(object):
     self.__get_info()
   
   def set_power(self, value):
-    value=int(value)
-    if value < -127 or value > 127:
+    if value < -1*self.MAX_MOTOR_POWER or value > self.MAX_MOTOR_POWER:
       raise ValueError("Power can only be +-127")
-    self.power = value
+    else:
+      self.power = value
+      self.log.info("power set to: "+str(self.power))
   
   def get_power(self):
     return self.power
@@ -113,48 +129,55 @@ class Robot(object):
   
   def up(self):
     self.log.debug("go up")
-    self.leftWhell.run(power=self.power)
-    self.rightWhell.run(power=self.power)
+    if self.state != self.STATE_UP:
+      self.state = self.STATE_UP
+      self.leftWhell.run(power=self.power)
+      self.rightWhell.run(power=self.power)
   
   def down(self):
     self.log.debug("go down")
-    self.brick.play_tone_and_wait(self.BUZZER, 1000)
-    self.leftWhell.run(power=-self.power)
-    self.rightWhell.run(power=-self.power)
+    if self.state != self.STATE_DOWN:
+      self.state = self.STATE_DOWN
+      self.leftWhell.run(power=-1*self.power)
+      self.rightWhell.run(power=-1*self.power)
   
   def right(self, withBrake=False):
     self.log.debug("go right")
-    self.leftWhell.run(power=self.power*self.TURN_POWER)
-    if withBrake:
-      self.rightWhell.brake()
-    else:
-      self.rightWhell.run(power=-self.power*self.TURN_POWER)
+    if self.state != self.STATE_RIGHT:
+      self.state = self.STATE_RIGHT
+      self.leftWhell.run(power=self.power*self.TURN_POWER)
+      if withBrake:
+        self.rightWhell.brake()
+      else:
+        self.rightWhell.run(power=-self.power*self.TURN_POWER)
   
   def left(self, withBrake=False):
     self.log.debug("go left")
-    if withBrake:
-      self.leftWhell.brake()
-    else:
-      self.leftWhell.run(power=-self.power*self.TURN_POWER)
-    self.rightWhell.run(power=self.power*self.TURN_POWER)
+    if self.state != self.STATE_LEFT:
+      self.state = self.STATE_LEFT
+      if withBrake:
+        self.leftWhell.brake()
+      else:
+        self.leftWhell.run(power=-self.power*self.TURN_POWER)
+      self.rightWhell.run(power=self.power*self.TURN_POWER)
   
   def stop(self):
     self.log.debug("go stop")
+    self.state = self.STATE_IDLE
     self.leftWhell.brake()
     self.rightWhell.brake()
-    #self.kicker.brake()
   
   def buzz(self):
     self.log.debug("buzz")
-    self.brick.play_tone_and_wait(self.BUZZER, 1000)
+    self.brick.play_tone_and_wait(self.BUZZER_HZ, 1000)
   
   def kick(self):
     self.log.debug("kick")
-    self.kicker.turn(-127, 85, brake=True)
+    self.kicker.turn(-127, self.KICK_DISTANCE, brake=True)
     threading.Timer(1.5, self.__kick_reset).start()
   
   def __kick_reset(self):
-    self.kicker.turn(127, 90, brake=False)
+    self.kicker.turn(127, self.KICK_DISTANCE, brake=True)
   
   #def __del__(self):
   #  self.log.debug("__del__")

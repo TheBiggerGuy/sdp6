@@ -242,6 +242,7 @@
                                 <signal name="toggled" handler="flip_video_feed"/>
                               </object>
                               <packing>
+                                <property name="fill">False</property>
                                 <property name="position">0</property>
                               </packing>
                             </child>
@@ -254,6 +255,7 @@
                                 <signal name="toggled" handler="fix_video_colour"/>
                               </object>
                               <packing>
+                                <property name="fill">False</property>
                                 <property name="position">1</property>
                               </packing>
                             </child>
@@ -292,6 +294,39 @@
                             <property name="position">2</property>
                           </packing>
                         </child>
+                        <child>
+                          <object class="GtkVBox" id="vbox7">
+                            <property name="visible">True</property>
+                            <child>
+                              <object class="GtkButton" id="button_saveFrame">
+                                <property name="label" translatable="yes">Save Frame</property>
+                                <property name="visible">True</property>
+                                <property name="can_focus">True</property>
+                                <property name="receives_default">True</property>
+                                <signal name="clicked" handler="save_frame"/>
+                              </object>
+                              <packing>
+                                <property name="fill">False</property>
+                                <property name="position">0</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkButton" id="button1">
+                                <property name="label" translatable="yes">Remove Background</property>
+                                <property name="visible">True</property>
+                                <property name="can_focus">True</property>
+                                <property name="receives_default">True</property>
+                                <signal name="clicked" handler="background_remove"/>
+                              </object>
+                              <packing>
+                                <property name="position">1</property>
+                              </packing>
+                            </child>
+                          </object>
+                          <packing>
+                            <property name="position">3</property>
+                          </packing>
+                        </child>
                       </object>
                     </child>
                     <child type="label">
@@ -328,18 +363,17 @@
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <child>
-                      <object class="GtkTable" id="table1">
+                      <object class="GtkTable" id="table_manualControl">
                         <property name="visible">True</property>
-                        <property name="n_rows">4</property>
+                        <property name="n_rows">5</property>
                         <property name="n_columns">3</property>
                         <property name="homogeneous">True</property>
                         <child>
                           <object class="GtkButton" id="button2">
                             <property name="label" translatable="yes">Up</property>
-                            <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="receives_default">True</property>
-                            <signal name="clicked" handler="on_manual_robot_control"/>
+                            <signal name="clicked" handler="on_manual_robot_control_up"/>
                           </object>
                           <packing>
                             <property name="left_attach">1</property>
@@ -350,9 +384,9 @@
                         <child>
                           <object class="GtkButton" id="button3">
                             <property name="label" translatable="yes">Left</property>
-                            <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="receives_default">True</property>
+                            <signal name="clicked" handler="on_manual_robot_control_left"/>
                           </object>
                           <packing>
                             <property name="top_attach">1</property>
@@ -363,9 +397,9 @@
                         <child>
                           <object class="GtkButton" id="button4">
                             <property name="label" translatable="yes">Stop</property>
-                            <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="receives_default">True</property>
+                            <signal name="clicked" handler="on_manual_robot_control_stop"/>
                           </object>
                           <packing>
                             <property name="left_attach">1</property>
@@ -378,9 +412,9 @@
                         <child>
                           <object class="GtkButton" id="button5">
                             <property name="label" translatable="yes">Right</property>
-                            <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="receives_default">True</property>
+                            <signal name="clicked" handler="on_manual_robot_control_right"/>
                           </object>
                           <packing>
                             <property name="left_attach">2</property>
@@ -393,10 +427,9 @@
                         <child>
                           <object class="GtkButton" id="button6">
                             <property name="label" translatable="yes">Down</property>
-                            <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="receives_default">True</property>
-                            <signal name="clicked" handler="on_manual_robot_control"/>
+                            <signal name="clicked" handler="on_manual_robot_control_down"/>
                           </object>
                           <packing>
                             <property name="left_attach">1</property>
@@ -412,21 +445,22 @@
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="receives_default">True</property>
+                            <signal name="toggled" handler="change_manual_control"/>
                           </object>
                           <packing>
                             <property name="left_attach">2</property>
                             <property name="right_attach">3</property>
-                            <property name="top_attach">3</property>
-                            <property name="bottom_attach">4</property>
+                            <property name="top_attach">4</property>
+                            <property name="bottom_attach">5</property>
                             <property name="y_options"></property>
                           </packing>
                         </child>
                         <child>
                           <object class="GtkButton" id="button7">
                             <property name="label" translatable="yes">Kick</property>
-                            <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="receives_default">True</property>
+                            <signal name="clicked" handler="on_manual_robot_control_kick"/>
                           </object>
                           <packing>
                             <property name="top_attach">3</property>
@@ -437,9 +471,9 @@
                         <child>
                           <object class="GtkButton" id="button8">
                             <property name="label" translatable="yes">Buzz</property>
-                            <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="receives_default">True</property>
+                            <signal name="clicked" handler="on_manual_robot_control_buzz"/>
                           </object>
                           <packing>
                             <property name="left_attach">1</property>
@@ -448,6 +482,25 @@
                             <property name="bottom_attach">4</property>
                             <property name="y_options"></property>
                           </packing>
+                        </child>
+                        <child>
+                          <object class="GtkVScale" id="vscale_manualPower">
+                            <property name="can_focus">True</property>
+                            <property name="adjustment">adjustment_manualPower</property>
+                            <property name="inverted">True</property>
+                            <property name="digits">0</property>
+                            <property name="value_pos">bottom</property>
+                            <signal name="value_changed" handler="manual_power_change"/>
+                          </object>
+                          <packing>
+                            <property name="left_attach">2</property>
+                            <property name="right_attach">3</property>
+                            <property name="top_attach">2</property>
+                            <property name="bottom_attach">4</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <placeholder/>
                         </child>
                         <child>
                           <placeholder/>
@@ -475,17 +528,7 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkButton" id="button_saveFrame">
-                    <property name="label" translatable="yes">Save Frame</property>
-                    <property name="visible">True</property>
-                    <property name="can_focus">True</property>
-                    <property name="receives_default">True</property>
-                    <signal name="clicked" handler="save_frame"/>
-                  </object>
-                  <packing>
-                    <property name="fill">False</property>
-                    <property name="position">1</property>
-                  </packing>
+                  <placeholder/>
                 </child>
                 <child>
                   <object class="GtkToggleButton" id="togglebutton_connect">
@@ -515,5 +558,13 @@
         </child>
       </object>
     </child>
+  </object>
+  <object class="GtkAdjustment" id="adjustment_manualPower">
+    <property name="value">80</property>
+    <property name="lower">-127</property>
+    <property name="upper">127</property>
+    <property name="step_increment">5</property>
+    <property name="page_increment">10</property>
+    <property name="page_size">10</property>
   </object>
 </interface>

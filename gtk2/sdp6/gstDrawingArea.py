@@ -27,6 +27,8 @@ class GstDrawingArea(gtk.DrawingArea):
     #self.set_size_request(500, 400)
     
     self.log.debug("GstDrawingArea init ok")
+    
+    self.imageToShow = None
 
   
   def __on_realize(self, widget):
@@ -45,7 +47,13 @@ class GstDrawingArea(gtk.DrawingArea):
       return
     drawable = self.window
     
-    pixbuf = gtk.gdk.pixbuf_new_from_file("logo.png")
+    if self.imageToShow == None:
+      pixbuf = gtk.gdk.pixbuf_new_from_file("logo.png")
+    else:
+      image = self.imageToShow
+      pixbuf = gtk.gdk.pixbuf_new_from_data(image.imageData, gtk.gdk.COLORSPACE_RGB, False,
+                image.depth, image.width, image.height, image.widthStep)
+    
     #x, y = drawable.get_size()
     pixbuf = pixbuf.scale_simple(self.width, self.height, gtk.gdk.INTERP_NEAREST)
     
@@ -54,17 +62,30 @@ class GstDrawingArea(gtk.DrawingArea):
     ctx.paint()
     ctx.stroke()
   
-  def save_frame(self, widget=None, data=None):
+  def show_img(self, img):
+    self.log.debug("show_img")
+    if self.is_playing():
+      self.stop_video()
+    
+    self.imageToShow = img
+    self.__on_expose_event()
+  
+  def get_frame(self, widget=None, data=None):
     drawable = self.window
     colormap = drawable.get_colormap()
     pixbuf = gtk.gdk.Pixbuf(gtk.gdk.COLORSPACE_RGB, 0, 8, *drawable.get_size())
     pixbuf = pixbuf.get_from_drawable(drawable, colormap, 0,0,0,0, *drawable.get_size())
-    name = "frame_" + str( time() ).replace(".", "")
-    pixbuf.save(name + ".png", 'png')
-    pixbuf.save(name + ".jpeg", 'jpeg')
     
-    self.log.info("Screen grab '" + name + ".jpg' made")
-    self.log.info("Screen grab '" + name + ".png' made")
+    return pixbuf
+  
+  def save_frame_to_file(self, widget=None, data=None):
+    pixbuf = self.get_frame(widget=widget, data=data)
+    
+    name = "frame_" + str( time() ).replace(".", "")+ ".png"
+    pixbuf.save(name, 'png')
+    self.log.info("Screen grab '" + name + "' made")
+    
+    return name
   
   def __gst_on_message(self, bus, message):
     t = message.type
