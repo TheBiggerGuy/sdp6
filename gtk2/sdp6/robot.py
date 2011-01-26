@@ -36,7 +36,7 @@ class Robot(object):
     
   def __init__(self, host=None):
     
-    self.power = self.DEFAULT_POWER
+    self.power = -1*self.DEFAULT_POWER
     self.address = host   
     
     self.log = logging.getLogger("Robot")
