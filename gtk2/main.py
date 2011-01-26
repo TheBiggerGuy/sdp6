@@ -239,34 +239,41 @@ class GTK_Main(object):
     self.log.debug("half_time")
     self.half_time = not self.half_time
   
-  def radio_feed_change(self, widget=None, data=None):
-    self.log.debug("radio_feed_change")
-    if self.feed_radio == "real":
-      self.feed_radio = "test"
-    else:
-      self.feed_radio = "real"
-  
-  def __connect(self, widget=None, data=None):
-    if not self.button_connect.get_active():
-      self.button_connect.set_active(True) # keep it active
-      return # ingnor button when not acctive
+  def connect_to_brick(self, widget=None, data=None):
+    self.log.debug("connect_to_brick")
+    if not widget.get_active():
+      return False # ingnor button when not acctive
     
     if self.robot != None:
       self.log.warning("Tryed to connect to a already connected brick")
-      return
-    
-    self.button_connect.set_label("Connecting")
+      return False
+
     try:
       # first try to find are know robot
       self.robot = Robot(host=self.BT_ADDRESS)
-      self.button_connect.set_label("Conected")
-      self.button_connect.set_active(True)
+      widget.set_label("Conected")
+      widget.set_active(True)
     except Exception as error:
       self.log.error(error)
-      self.button_connect.set_label("Connect")
-      self.button_connect.set_active(False)
+      widget.set_label("Connect")
+      widget.set_active(False)
       self.robot = None
   
+  def radio_feed_change_real(self, widget=None, data=None):
+    self.log.debug("radio_feed_change real")
+    if self.feed_radio != "real":
+      self.feed_radio = "real"
+      
+  def radio_feed_change_test(self, widget=None, data=None):
+    self.log.debug("radio_feed_change test")
+    if self.feed_radio != "test":
+      self.feed_radio = "test"
+      
+  def radio_feed_change_file(self, widget=None, data=None):
+    self.log.debug("radio_feed_change file")
+    if self.feed_radio != "file":
+      self.feed_radio = "file"
+
   def __del__(self):
     self.log.info("__del__")
     self.robot = None
